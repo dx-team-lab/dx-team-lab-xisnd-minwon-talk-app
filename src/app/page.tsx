@@ -15,7 +15,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
 
-  const heroImage = PlaceHolderImages.find(img => img.id === 'project-1');
+  const heroImage = PlaceHolderImages.find(img => img.id === 'project-2'); // 건물이 올라가는 이미지로 변경
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F0F4FF] items-center justify-center p-4">
@@ -26,20 +26,24 @@ export default function AuthPage() {
         <div className="w-full md:w-1/2 p-12 flex flex-col justify-between relative overflow-hidden bg-white">
           <div className="z-10">
             <h1 className="text-3xl font-bold leading-tight mb-8">
-              우리의 프로젝트를<br />
-              <span className="text-black">영업정보시스템에서 쉽게 관리하세요 😛</span>
+              건설 현장 민원 관리의 시작,<br />
+              <span className="text-black">민원 커뮤니티에서 스마트하게 해결하세요 🛡️</span>
             </h1>
             
             <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-100 mt-4">
               <Image
                 src={heroImage?.imageUrl || "https://picsum.photos/seed/auth/800/600"}
-                alt="Dashboard Preview"
+                alt="Construction Management"
                 fill
                 className="object-cover"
-                data-ai-hint="construction dashboard"
+                data-ai-hint="construction communication"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none" />
             </div>
+            <p className="mt-6 text-slate-500 text-sm leading-relaxed">
+              체계적인 민원 데이터 분석과 AI 대응 어시스턴트를 통해<br />
+              현장의 원활한 소통과 효율적인 보상 관리를 지원합니다.
+            </p>
           </div>
           
           {/* Decorative Elements */}
@@ -49,6 +53,11 @@ export default function AuthPage() {
         {/* Right Side: Auth Form */}
         <div className="w-full md:w-1/2 p-12 flex flex-col justify-center border-l border-slate-50">
           <div className="max-w-md mx-auto w-full space-y-8">
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl font-bold text-slate-900">{isLogin ? "환영합니다!" : "회원가입"}</h2>
+              <p className="text-slate-500 mt-2 text-sm">민원 커뮤니티 서비스 이용을 위해 로그인하세요.</p>
+            </div>
+
             <div className="space-y-6">
               {/* Email Input */}
               <div className="space-y-2">
@@ -119,7 +128,7 @@ export default function AuthPage() {
                   onClick={() => setIsLogin(!isLogin)}
                   className="text-sm font-medium text-blue-600 hover:underline"
                 >
-                  {isLogin ? "회원가입" : "로그인으로 돌아가기"}
+                  {isLogin ? "계정이 없으신가요? 회원가입" : "이미 계정이 있나요? 로그인"}
                 </button>
               </div>
             </div>
@@ -130,7 +139,7 @@ export default function AuthPage() {
       {/* Footer */}
       <footer className="mt-8 text-center">
         <p className="text-slate-400 text-sm font-medium">
-          © XI S&D, All Rights Reserved. Designed & Developed by DX Team.
+          © MinwonTalk. All Rights Reserved. Designed & Developed by DX Team.
         </p>
       </footer>
     </div>
