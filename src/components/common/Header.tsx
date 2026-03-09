@@ -7,7 +7,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown, LogOut, User, Home, FolderKanban, Settings } from 'lucide-react';
+import { ChevronDown, LogOut, User, Settings } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -20,10 +20,6 @@ export default function Header() {
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="#" className="flex items-center gap-1.5 text-sm font-medium hover:text-primary transition-colors">
-              <FolderKanban className="h-4 w-4" />
-              프로젝트
-            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors outline-none">
                 <Settings className="h-4 w-4 mr-1" />
