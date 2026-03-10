@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -6,16 +8,15 @@ import { BADGE_COLORS, type DemandType, type CompensationMethod } from '@/lib/co
 import { cn } from '@/lib/utils';
 
 export default function CaseTable() {
+  // 요구사항(demands)을 배열로 변경하여 다중 선택 지원 및 데이터 통합
   const cases = [
-    { demand: '재산 피해 보상', date: '2019-05-29', progress: '종결', method: '근태로', amount: 1493590 },
-    { demand: '재산 피해 보상', date: '2020-01-16', progress: '종결', method: '시설보수', amount: 2420000 },
-    { demand: '정신적 피해 보상', date: '2021-10-29', progress: '종결', method: '현물보상', amount: 50000000 },
-    { demand: '정신적 피해 보상', date: '2022-07-12', progress: '종결', method: '시설보수', amount: 3718000 },
-    { demand: '정신적 피해 보상', date: '2020-09-16', progress: '종결', method: '현물보상', amount: 11128440 },
-    { demand: '영업 피해 보상', date: '-', progress: '-', method: '-', amount: 0 },
-    { demand: '정신적 피해 보상', date: '2021-04-07', progress: '종결', method: '현물보상', amount: 15384600 },
-    { demand: '정신적 피해 보상', date: '2023-05-31', progress: '종결', method: '현물보상', amount: 12820510 },
-    { demand: '영업 피해 보상', date: '-', progress: '-', method: '-', amount: 0 }
+    { demands: ['재산 피해 보상'], date: '2019-05-29', progress: '종결', method: '근태로', amount: 1493590 },
+    { demands: ['재산 피해 보상'], date: '2020-01-16', progress: '종결', method: '시설보수', amount: 2420000 },
+    { demands: ['정신적 피해 보상'], date: '2021-10-29', progress: '종결', method: '현물보상', amount: 50000000 },
+    { demands: ['정신적 피해 보상'], date: '2022-07-12', progress: '종결', method: '시설보수', amount: 3718000 },
+    { demands: ['정신적 피해 보상', '영업 피해 보상'], date: '2020-09-16', progress: '종결', method: '현물보상', amount: 11128440 },
+    { demands: ['정신적 피해 보상'], date: '2021-04-07', progress: '종결', method: '현물보상', amount: 15384600 },
+    { demands: ['정신적 피해 보상', '영업 피해 보상'], date: '2023-05-31', progress: '종결', method: '현물보상', amount: 12820510 },
   ];
 
   const formatAmount = (num: number) => {
@@ -47,20 +48,23 @@ export default function CaseTable() {
             {cases.map((item, idx) => (
               <TableRow key={idx} className="hover:bg-slate-50 transition-colors">
                 <TableCell>
-                  {item.demand !== '-' && (
-                    <Badge 
-                      variant="outline"
-                      className={cn(
-                        "border-none shadow-none py-1 px-3 whitespace-nowrap font-bold",
-                        BADGE_COLORS.demandType[item.demand as DemandType]?.bg || "bg-slate-100",
-                        BADGE_COLORS.demandType[item.demand as DemandType]?.text || "text-slate-700"
-                      )}
-                    >
-                      {item.demand}
-                    </Badge>
-                  )}
+                  <div className="flex flex-wrap gap-1.5 min-w-[140px]">
+                    {item.demands.map((demand) => (
+                      <Badge 
+                        key={demand}
+                        variant="outline"
+                        className={cn(
+                          "border-none shadow-none py-1 px-2.5 whitespace-nowrap font-bold text-[11px]",
+                          BADGE_COLORS.demandType[demand as DemandType]?.bg || "bg-slate-100",
+                          BADGE_COLORS.demandType[demand as DemandType]?.text || "text-slate-700"
+                        )}
+                      >
+                        {demand}
+                      </Badge>
+                    ))}
+                  </div>
                 </TableCell>
-                <TableCell className="text-slate-600 tabular-nums">{item.date}</TableCell>
+                <TableCell className="text-slate-600 tabular-nums whitespace-nowrap">{item.date}</TableCell>
                 <TableCell className="text-slate-600">{item.progress}</TableCell>
                 <TableCell>
                   <button className="text-primary underline hover:text-primary/80 font-medium decoration-primary/30 underline-offset-4">
