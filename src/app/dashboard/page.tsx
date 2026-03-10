@@ -34,6 +34,11 @@ export default function DashboardPage() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc(userProfileRef);
 
+  // Check if any filter is active
+  const isFilterActive = useMemo(() => {
+    return Object.values(filters).some(v => v.length > 0);
+  }, [filters]);
+
   // Firestore Data Fetching - Only fetch when user is authenticated
   const guidesQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -48,9 +53,11 @@ export default function DashboardPage() {
   const { data: rawGuides, isLoading: isGuidesLoading } = useCollection(guidesQuery);
   const { data: rawCases, isLoading: isCasesLoading } = useCollection(casesQuery);
 
-  // Filter Logic
+  // Filter Logic for Guides
   const filteredGuides = useMemo(() => {
     if (!rawGuides) return [];
+    if (!isFilterActive) return []; // Don't filter if no active filters
+    
     return rawGuides.filter(g => {
       const matchRegion = filters.region.length === 0 || filters.region.includes(g.region);
       const matchPhase = filters.phase.length === 0 || filters.phase.includes(g.phase);
@@ -60,8 +67,9 @@ export default function DashboardPage() {
           : filters.type.includes(g.type));
       return matchRegion && matchPhase && matchType;
     });
-  }, [rawGuides, filters]);
+  }, [rawGuides, filters, isFilterActive]);
 
+  // Filter Logic for Cases
   const filteredCases = useMemo(() => {
     if (!rawCases) return [];
     return rawCases.filter(c => {
@@ -163,9 +171,16 @@ export default function DashboardPage() {
           onReset={resetFilters}
           resultCount={filteredGuides.length + filteredCases.length}
         />
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-          <ResponsePlanTable data={filteredGuides} isLoading={isGuidesLoading} />
-          <CaseTable data={filteredCases} isLoading={isCasesLoading} />
+        <div className="grid grid-cols-1 gap-8 items-start">
+          <ResponsePlanTable 
+            data={filteredGuides} 
+            isLoading={isGuidesLoading} 
+            isFilterActive={isFilterActive} 
+          />
+          <CaseTable 
+            data={filteredCases} 
+            isLoading={isCasesLoading} 
+          />
         </div>
       </main>
     </div>
