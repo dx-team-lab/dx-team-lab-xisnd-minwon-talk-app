@@ -28,7 +28,9 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
           <Table>
             <TableHeader className="bg-slate-50 border-b">
               <TableRow>
-                <TableHead className="font-bold text-slate-700">지역/단계/유형</TableHead>
+                <TableHead className="font-bold text-slate-700 text-center w-[80px] border-r">지역</TableHead>
+                <TableHead className="font-bold text-slate-700 text-center w-[80px] border-r">단계</TableHead>
+                <TableHead className="font-bold text-slate-700 text-center w-[120px] border-r">유형</TableHead>
                 <TableHead className="font-bold text-slate-700">민원인</TableHead>
                 <TableHead className="font-bold text-slate-700">요구사항</TableHead>
                 <TableHead className="font-bold text-slate-700">보상방식</TableHead>
@@ -39,14 +41,17 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
               {data && data.length > 0 ? (
                 data.map((item, idx) => (
                   <TableRow key={idx} className="hover:bg-slate-50 transition-colors">
-                    <TableCell className="p-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] text-slate-400 font-bold">{item.region} · {item.phase}</span>
-                        <div className="flex flex-wrap gap-1">
-                          {Array.isArray(item.type) ? item.type.map((t: string) => (
-                            <Badge key={t} variant="outline" className="text-[9px] h-4 px-1">{t}</Badge>
-                          )) : <Badge variant="outline" className="text-[9px] h-4 px-1">{item.type}</Badge>}
-                        </div>
+                    <TableCell className="p-4 text-center text-xs font-bold text-slate-500 whitespace-nowrap border-r">
+                      {item.region}
+                    </TableCell>
+                    <TableCell className="p-4 text-center text-sm font-bold text-primary whitespace-nowrap border-r">
+                      {item.phase}
+                    </TableCell>
+                    <TableCell className="p-4 border-r">
+                      <div className="flex flex-wrap justify-center gap-1">
+                        {Array.isArray(item.type) ? item.type.map((t: string) => (
+                          <Badge key={t} variant="outline" className="text-[9px] h-4 px-1">{t}</Badge>
+                        )) : <Badge variant="outline" className="text-[9px] h-4 px-1">{item.type}</Badge>}
                       </div>
                     </TableCell>
                     <TableCell className="p-4 text-sm font-bold text-slate-700">
@@ -77,7 +82,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-24 text-slate-400">
+                  <TableCell colSpan={7} className="text-center py-24 text-slate-400">
                     등록된 보상 사례 데이터가 없습니다.
                   </TableCell>
                 </TableRow>
