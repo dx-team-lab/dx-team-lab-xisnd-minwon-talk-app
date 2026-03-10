@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -171,9 +172,9 @@ export default function AuthPage() {
               </Button>
               
               <div className="flex items-center justify-between px-1">
-                <button type="button" className="text-sm font-medium text-blue-600 hover:underline">
+                <Link href="/forgot-password" size="sm" className="text-sm font-medium text-blue-600 hover:underline">
                   비밀번호를 잊으셨나요?
-                </button>
+                </Link>
                 <button 
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
