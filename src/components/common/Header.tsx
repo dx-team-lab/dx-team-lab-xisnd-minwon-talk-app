@@ -9,14 +9,22 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown, LogOut, User, Settings, Loader2, Users } from 'lucide-react';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { collection } from 'firebase/firestore';
 
 export default function Header() {
   const auth = useAuth();
+  const db = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+
+  // 관리자 권한 확인을 위해 roles_admin 컬렉션 조회
+  const adminsQuery = useMemoFirebase(() => collection(db, 'roles_admin'), [db]);
+  const { data: admins } = useCollection(adminsQuery);
+  
+  const isAdmin = user && admins ? admins.some(a => a.id === user.uid) : false;
 
   const handleLogout = async () => {
     try {
@@ -36,25 +44,28 @@ export default function Header() {
             <span className="text-xl font-headline font-bold text-primary">민원 커뮤니티</span>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-6">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors outline-none">
-                <Settings className="h-4 w-4 mr-1" />
-                설정
-                <ChevronDown className="h-4 w-4 ml-0.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/users" className="flex w-full items-center gap-2 cursor-pointer">
-                    <Users className="h-4 w-4" />
-                    사용자 관리
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">시스템 설정</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">알림 설정</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </nav>
+          {/* 관리자 권한이 있는 경우에만 설정 메뉴 표시 */}
+          {isAdmin && (
+            <nav className="hidden md:flex items-center gap-6">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors outline-none">
+                  <Settings className="h-4 w-4 mr-1" />
+                  설정
+                  <ChevronDown className="h-4 w-4 ml-0.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/users" className="flex w-full items-center gap-2 cursor-pointer">
+                      <Users className="h-4 w-4" />
+                      사용자 관리
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">시스템 설정</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">알림 설정</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </nav>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
