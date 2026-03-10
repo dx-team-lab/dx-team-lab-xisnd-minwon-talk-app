@@ -1,0 +1,151 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  useMemoFirebase, 
+  useCollection, 
+  useUser, 
+  useFirestore,
+  updateDocumentNonBlocking,
+  setDocumentNonBlocking,
+  deleteDocumentNonBlocking
+} from '@/firebase';
+import { collection, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import Header from '@/components/common/Header';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Loader2, Shield, UserCog, User } from 'lucide-react';
+
+export default function UserManagementPage() {
+  const { user, isUserLoading } = useUser();
+  const db = useFirestore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/');
+    }
+  }, [user, isUserLoading, router]);
+
+  const usersQuery = useMemoFirebase(() => collection(db, 'users'), [db]);
+  const adminsQuery = useMemoFirebase(() => collection(db, 'roles_admin'), [db]);
+  const managersQuery = useMemoFirebase(() => collection(db, 'roles_manager'), [db]);
+
+  const { data: users, isLoading: isUsersLoading } = useCollection(usersQuery);
+  const { data: admins } = useCollection(adminsQuery);
+  const { data: managers } = useCollection(managersQuery);
+
+  const isAdmin = (userId: string) => admins?.some(a => a.id === userId);
+  const isManager = (userId: string) => managers?.some(m => m.id === userId);
+
+  const toggleAdmin = (userId: string, current: boolean) => {
+    const roleRef = doc(db, 'roles_admin', userId);
+    if (current) {
+      deleteDocumentNonBlocking(roleRef);
+    } else {
+      setDocumentNonBlocking(roleRef, { assignedAt: new Date().toISOString() }, { merge: true });
+    }
+  };
+
+  const toggleManager = (userId: string, current: boolean) => {
+    const roleRef = doc(db, 'roles_manager', userId);
+    if (current) {
+      deleteDocumentNonBlocking(roleRef);
+    } else {
+      setDocumentNonBlocking(roleRef, { assignedAt: new Date().toISOString() }, { merge: true });
+    }
+  };
+
+  if (isUserLoading || isUsersLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F0F4FF]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F0F4FF]">
+      <Header />
+      <main className="container mx-auto px-4 py-8 space-y-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-headline font-bold text-slate-900">사용자 관리</h1>
+          <p className="text-slate-500 text-sm">시스템의 사용자 권한을 설정하고 관리합니다.</p>
+        </div>
+
+        <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm">
+          <CardHeader className="bg-white border-b py-4">
+            <CardTitle className="text-xl font-headline flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              사용자 권한 설정
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-slate-50 border-b">
+                <TableRow>
+                  <TableHead className="font-bold text-slate-700">사용자 정보</TableHead>
+                  <TableHead className="font-bold text-slate-700">이메일</TableHead>
+                  <TableHead className="font-bold text-slate-700">현재 역할</TableHead>
+                  <TableHead className="font-bold text-slate-700 text-center">관리자 권한</TableHead>
+                  <TableHead className="font-bold text-slate-700 text-center">매니저 권한</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users && users.length > 0 ? (
+                  users.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-slate-50 transition-colors">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <span>{u.displayName || '이름 없음'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-slate-600">{u.email}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {isAdmin(u.id) && <Badge className="bg-red-50 text-red-700 border-red-100">관리자</Badge>}
+                          {isManager(u.id) && <Badge className="bg-blue-50 text-blue-700 border-blue-100">매니저</Badge>}
+                          {!isAdmin(u.id) && !isManager(u.id) && <Badge variant="outline">일반</Badge>}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center">
+                          <Switch 
+                            checked={isAdmin(u.id)} 
+                            onCheckedChange={() => toggleAdmin(u.id, !!isAdmin(u.id))}
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center">
+                          <Switch 
+                            checked={isManager(u.id)} 
+                            onCheckedChange={() => toggleManager(u.id, !!isManager(u.id))}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-12 text-slate-500">
+                      등록된 사용자가 없습니다.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

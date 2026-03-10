@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -11,7 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useAuth, useUser, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase';
+import { useAuth, useUser, useFirestore, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,6 +23,7 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const auth = useAuth();
+  const db = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
@@ -30,6 +32,24 @@ export default function AuthPage() {
       router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
+
+  // Auth state listener to create profile on signup
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser && !isLogin) {
+        // Create initial profile document if it was a signup
+        const userRef = doc(db, 'users', authUser.uid);
+        await setDoc(userRef, {
+          id: authUser.uid,
+          email: authUser.email,
+          displayName: authUser.displayName || authUser.email?.split('@')[0],
+          role: 'viewer',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+      }
+    });
+    return () => unsubscribe();
+  }, [auth, db, isLogin]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,8 +101,7 @@ export default function AuthPage() {
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none" />
             </div>
             <p className="mt-6 text-slate-500 text-sm leading-relaxed">
-              체계적인 민원 데이터 분석을 통해<br />
-              현장의 원활한 소통과 효율적인 보상 관리를 지원합니다.
+              체계적인 민원 데이터 분석을 통해 현장의 원활한 소통과 효율적인 보상 관리를 지원합니다.
             </p>
           </div>
           

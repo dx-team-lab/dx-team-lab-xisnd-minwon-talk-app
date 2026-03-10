@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -9,7 +8,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown, LogOut, User, Settings, Loader2 } from 'lucide-react';
+import { ChevronDown, LogOut, User, Settings, Loader2, Users } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -45,9 +44,14 @@ export default function Header() {
                 <ChevronDown className="h-4 w-4 ml-0.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuItem>시스템 설정</DropdownMenuItem>
-                <DropdownMenuItem>사용자 관리</DropdownMenuItem>
-                <DropdownMenuItem>알림 설정</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/users" className="flex w-full items-center gap-2 cursor-pointer">
+                    <Users className="h-4 w-4" />
+                    사용자 관리
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">시스템 설정</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">알림 설정</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>
@@ -65,8 +69,10 @@ export default function Header() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="rounded-full" asChild>
+               <Link href="/dashboard/profile">
+                <User className="h-5 w-5" />
+               </Link>
             </Button>
             <Button 
               variant="outline" 
