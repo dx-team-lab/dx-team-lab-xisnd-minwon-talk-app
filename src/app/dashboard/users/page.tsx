@@ -7,24 +7,24 @@ import {
   useCollection, 
   useUser, 
   useFirestore,
-  updateDocumentNonBlocking,
   setDocumentNonBlocking,
   deleteDocumentNonBlocking
 } from '@/firebase';
-import { collection, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import Header from '@/components/common/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Loader2, Shield, UserCog, User } from 'lucide-react';
+import { Loader2, Shield, User, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function UserManagementPage() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -42,8 +42,18 @@ export default function UserManagementPage() {
 
   const isAdmin = (userId: string) => admins?.some(a => a.id === userId);
   const isManager = (userId: string) => managers?.some(m => m.id === userId);
+  
+  const isCurrentUserAdmin = user ? isAdmin(user.uid) : false;
 
   const toggleAdmin = (userId: string, current: boolean) => {
+    if (!isCurrentUserAdmin && user?.uid !== userId) {
+      toast({
+        title: "권한 부족",
+        description: "다른 사용자의 관리자 권한을 변경하려면 관리자 권한이 필요합니다.",
+        variant: "destructive"
+      });
+      return;
+    }
     const roleRef = doc(db, 'roles_admin', userId);
     if (current) {
       deleteDocumentNonBlocking(roleRef);
@@ -53,6 +63,14 @@ export default function UserManagementPage() {
   };
 
   const toggleManager = (userId: string, current: boolean) => {
+    if (!isCurrentUserAdmin && user?.uid !== userId) {
+      toast({
+        title: "권한 부족",
+        description: "다른 사용자의 매니저 권한을 변경하려면 관리자 권한이 필요합니다.",
+        variant: "destructive"
+      });
+      return;
+    }
     const roleRef = doc(db, 'roles_manager', userId);
     if (current) {
       deleteDocumentNonBlocking(roleRef);
@@ -73,9 +91,17 @@ export default function UserManagementPage() {
     <div className="min-h-screen bg-[#F0F4FF]">
       <Header />
       <main className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-headline font-bold text-slate-900">사용자 관리</h1>
-          <p className="text-slate-500 text-sm">시스템의 사용자 권한을 설정하고 관리합니다.</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-headline font-bold text-slate-900">사용자 관리</h1>
+            <p className="text-slate-500 text-sm">시스템의 사용자 권한을 설정하고 관리합니다.</p>
+          </div>
+          {!isCurrentUserAdmin && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-100 text-sm font-medium">
+              <AlertCircle className="h-4 w-4" />
+              현재 테스트 모드: 본인의 권한만 직접 제어할 수 있습니다.
+            </div>
+          )}
         </div>
 
         <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm">
@@ -105,7 +131,7 @@ export default function UserManagementPage() {
                           <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                             <User className="h-4 w-4" />
                           </div>
-                          <span>{u.displayName || '이름 없음'}</span>
+                          <span>{u.displayName || '이름 없음'} {u.id === user?.uid && '(나)'}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-slate-600">{u.email}</TableCell>
@@ -121,6 +147,7 @@ export default function UserManagementPage() {
                           <Switch 
                             checked={isAdmin(u.id)} 
                             onCheckedChange={() => toggleAdmin(u.id, !!isAdmin(u.id))}
+                            disabled={!isCurrentUserAdmin && u.id !== user?.uid}
                           />
                         </div>
                       </TableCell>
@@ -129,6 +156,7 @@ export default function UserManagementPage() {
                           <Switch 
                             checked={isManager(u.id)} 
                             onCheckedChange={() => toggleManager(u.id, !!isManager(u.id))}
+                            disabled={!isCurrentUserAdmin && u.id !== user?.uid}
                           />
                         </div>
                       </TableCell>
