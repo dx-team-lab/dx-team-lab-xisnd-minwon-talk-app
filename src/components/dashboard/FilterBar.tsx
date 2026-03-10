@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FILTER_OPTIONS } from '@/lib/constants';
-import { Search, RotateCcw, Download, Grid, Table as TableIcon, MapPin, X } from 'lucide-react';
+import { Search, RotateCcw, Download, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 
@@ -109,21 +109,6 @@ export default function FilterBar() {
           <p className="text-sm text-muted-foreground">
             진행 단계와 발생 건수 및 관계가 가장 많은 진행중 프로젝트를 가장 먼저 보여줍니다.
           </p>
-        </div>
-        
-        <div className="flex items-center bg-white border rounded-lg p-1">
-          <Button variant="ghost" size="sm" className="h-8 gap-1.5 bg-slate-100 font-bold">
-            <TableIcon className="h-4 w-4" />
-            표
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 gap-1.5 hover:bg-slate-100">
-            <Grid className="h-4 w-4" />
-            갤러리
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 gap-1.5 hover:bg-slate-100">
-            <MapPin className="h-4 w-4" />
-            지도
-          </Button>
         </div>
       </div>
     </div>
