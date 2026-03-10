@@ -28,12 +28,12 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
           <Table>
             <TableHeader className="bg-slate-50 border-b">
               <TableRow>
-                <TableHead className="font-bold text-slate-700 text-center w-[80px] border-r">지역</TableHead>
-                <TableHead className="font-bold text-slate-700 text-center w-[80px] border-r">단계</TableHead>
+                <TableHead className="font-bold text-slate-700 text-center w-[70px] border-r">지역</TableHead>
+                <TableHead className="font-bold text-slate-700 text-center w-[70px] border-r">단계</TableHead>
                 <TableHead className="font-bold text-slate-700 text-center w-[100px] border-r">유형</TableHead>
-                <TableHead className="font-bold text-slate-700 w-[150px] border-r">민원인</TableHead>
-                <TableHead className="font-bold text-slate-700">요구사항</TableHead>
-                <TableHead className="font-bold text-slate-700">보상방식</TableHead>
+                <TableHead className="font-bold text-slate-700 w-[180px] border-r">민원인</TableHead>
+                <TableHead className="font-bold text-slate-700 border-r">요구사항</TableHead>
+                <TableHead className="font-bold text-slate-700 border-r">보상방식</TableHead>
                 <TableHead className="font-bold text-slate-700 text-right">보상금액(원)</TableHead>
               </TableRow>
             </TableHeader>
@@ -57,7 +57,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                     <TableCell className="p-4 text-sm font-bold text-slate-700 border-r">
                       {item.complainant}
                     </TableCell>
-                    <TableCell className="p-4">
+                    <TableCell className="p-4 border-r">
                       <div className="flex flex-col gap-1">
                         {Array.isArray(item.requestType) ? item.requestType.map((rt: string) => (
                           <Badge key={rt} variant="outline" className={cn("whitespace-nowrap font-bold w-fit", CASE_BADGE_COLORS[rt] || "")}>
@@ -70,7 +70,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="p-4">
+                    <TableCell className="p-4 border-r">
                       <Badge variant="outline" className={cn("whitespace-nowrap font-bold", METHOD_BADGE_COLORS[item.compensationStatus] || "")}>
                         {item.compensationStatus}
                       </Badge>
