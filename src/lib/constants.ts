@@ -10,7 +10,7 @@ export const FILTER_OPTIONS: Record<string, { label: string; options: string[] }
   },
   type: {
     label: '유형',
-    options: ['전체', '소음', '비산먼지', '진동', '교통', '언론', '파손', '폐기물']
+    options: ['전체', '소음', '비산먼지', '진동', '교통', '언론', '파손', '폐기물', '야간의혹', '영업피해', '출입통제']
   },
   compensation: {
     label: '보상 사례',

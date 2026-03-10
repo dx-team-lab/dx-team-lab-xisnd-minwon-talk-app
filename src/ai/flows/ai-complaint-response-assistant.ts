@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI assistant that analyzes civil complaint details and suggests optimal response actions.
@@ -14,7 +15,7 @@ const AIComplaintResponseAssistantInputSchema = z.object({
   description: z.string().describe('The detailed description of the civil complaint.'),
   region: z.enum(['주거지역', '상업지역', '공업지역']).describe('The region or district where the complaint occurred.').optional(),
   phase: z.enum(['착수전', '철거', '토공', '골조', '마감', '준공이후']).describe('The current construction phase when the complaint occurred.').optional(),
-  type: z.enum(['소음', '비산먼지', '진동', '교통', '언론', '파손', '폐기물']).describe('The type of the complaint (e.g., noise, dust, vibration).').optional(),
+  type: z.enum(['소음', '비산먼지', '진동', '교통', '언론', '파손', '폐기물', '야간의혹', '영업피해', '출입통제']).describe('The type of the complaint (e.g., noise, dust, vibration).').optional(),
 });
 export type AIComplaintResponseAssistantInput = z.infer<typeof AIComplaintResponseAssistantInputSchema>;
 
