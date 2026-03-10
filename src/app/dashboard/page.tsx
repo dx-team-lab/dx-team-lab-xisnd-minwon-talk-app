@@ -35,9 +35,16 @@ export default function DashboardPage() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc(userProfileRef);
 
-  // Firestore Data Fetching
-  const guidesQuery = useMemoFirebase(() => query(collection(db, 'responseGuides'), orderBy('createdAt', 'desc')), [db]);
-  const casesQuery = useMemoFirebase(() => query(collection(db, 'caseExamples'), orderBy('createdAt', 'desc')), [db]);
+  // Firestore Data Fetching - Only fetch when user is authenticated
+  const guidesQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'responseGuides'), orderBy('createdAt', 'desc'));
+  }, [db, user]);
+
+  const casesQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'caseExamples'), orderBy('createdAt', 'desc'));
+  }, [db, user]);
   
   const { data: rawGuides, isLoading: isGuidesLoading } = useCollection(guidesQuery);
   const { data: rawCases, isLoading: isCasesLoading } = useCollection(casesQuery);

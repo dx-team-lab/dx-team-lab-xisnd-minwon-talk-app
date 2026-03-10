@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -33,8 +34,15 @@ export default function UserManagementPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const usersQuery = useMemoFirebase(() => collection(db, 'users'), [db]);
-  const adminsQuery = useMemoFirebase(() => collection(db, 'roles_admin'), [db]);
+  const usersQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return collection(db, 'users');
+  }, [db, user]);
+
+  const adminsQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return collection(db, 'roles_admin');
+  }, [db, user]);
 
   const { data: users, isLoading: isUsersLoading } = useCollection(usersQuery);
   const { data: admins } = useCollection(adminsQuery);

@@ -16,8 +16,15 @@ export default function SystemSettingsPage() {
   const db = useFirestore();
   const router = useRouter();
 
-  const adminsQuery = useMemoFirebase(() => collection(db, 'roles_admin'), [db]);
-  const managersQuery = useMemoFirebase(() => collection(db, 'roles_manager'), [db]);
+  const adminsQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return collection(db, 'roles_admin');
+  }, [db, user]);
+
+  const managersQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return collection(db, 'roles_manager');
+  }, [db, user]);
   
   const { data: admins, isLoading: isAdminLoading } = useCollection(adminsQuery);
   const { data: managers, isLoading: isManagerLoading } = useCollection(managersQuery);
