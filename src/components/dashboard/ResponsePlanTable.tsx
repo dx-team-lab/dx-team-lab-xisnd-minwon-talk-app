@@ -1,3 +1,4 @@
+'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -79,12 +80,12 @@ export default function ResponsePlanTable() {
           { num: "⑥", title: "민원일지 관리(BM)" }
         ]
       },
-      strategy: {
+      strategy: null,
+      settlement: {
         num: "③",
         title: "회계처리 / 집행(BM)",
         items: []
-      },
-      settlement: null
+      }
     }
   ];
 
