@@ -18,6 +18,19 @@ export const FILTER_OPTIONS: Record<string, { label: string; options: string[] }
   }
 };
 
+export const TYPE_BADGE_COLORS: Record<string, string> = {
+  '소음': 'bg-rose-100 text-rose-700 border-rose-200',
+  '비산먼지': 'bg-slate-100 text-slate-700 border-slate-200',
+  '진동': 'bg-amber-100 text-amber-700 border-amber-200',
+  '교통': 'bg-blue-100 text-blue-700 border-blue-200',
+  '언론': 'bg-purple-100 text-purple-700 border-purple-200',
+  '파손': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  '폐기물': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  '야간의혹': 'bg-zinc-100 text-zinc-700 border-zinc-200',
+  '영업피해': 'bg-cyan-100 text-cyan-700 border-cyan-200',
+  '출입통제': 'bg-orange-100 text-orange-700 border-orange-200'
+};
+
 export const CASE_BADGE_COLORS: Record<string, string> = {
   '정신적피해보상': 'bg-blue-100 text-blue-700 border-blue-200',
   '영업피해보상': 'bg-amber-100 text-amber-700 border-amber-200',
@@ -38,6 +51,7 @@ export const METHOD_BADGE_COLORS: Record<string, string> = {
 };
 
 export const BADGE_COLORS = {
+  type: TYPE_BADGE_COLORS,
   demandType: CASE_BADGE_COLORS,
   compensationMethod: METHOD_BADGE_COLORS
 } as const;

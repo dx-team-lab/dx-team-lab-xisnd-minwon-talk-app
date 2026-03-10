@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CASE_BADGE_COLORS, METHOD_BADGE_COLORS } from '@/lib/constants';
+import { CASE_BADGE_COLORS, METHOD_BADGE_COLORS, TYPE_BADGE_COLORS } from '@/lib/constants';
 
 interface CaseTableProps {
   data: any[] | null;
@@ -50,8 +51,21 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                     <TableCell className="p-4 border-r">
                       <div className="flex flex-col items-center gap-1">
                         {Array.isArray(item.type) ? item.type.map((t: string) => (
-                          <Badge key={t} variant="outline" className="text-[9px] h-4 px-1 whitespace-nowrap">{t}</Badge>
-                        )) : <Badge variant="outline" className="text-[9px] h-4 px-1 whitespace-nowrap">{item.type}</Badge>}
+                          <Badge 
+                            key={t} 
+                            variant="outline" 
+                            className={cn("text-[9px] h-4 px-1 whitespace-nowrap font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                          >
+                            {t}
+                          </Badge>
+                        )) : (
+                          <Badge 
+                            variant="outline" 
+                            className={cn("text-[9px] h-4 px-1 whitespace-nowrap font-bold", TYPE_BADGE_COLORS[item.type] || "bg-secondary text-secondary-foreground")}
+                          >
+                            {item.type}
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="p-4 text-sm font-bold text-slate-700 border-r">

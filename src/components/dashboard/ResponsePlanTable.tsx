@@ -1,9 +1,12 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { TYPE_BADGE_COLORS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface ResponsePlanTableProps {
   data: any[] | null;
@@ -49,8 +52,21 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive }: R
                       <TableCell className="border-r text-center align-top p-4">
                         <div className="flex flex-wrap justify-center gap-1">
                           {Array.isArray(row.type) ? row.type.map((t: string) => (
-                            <Badge key={t} variant="secondary" className="text-[10px] px-1 font-bold whitespace-nowrap">{t}</Badge>
-                          )) : <Badge variant="secondary" className="text-[10px] px-1 font-bold whitespace-nowrap">{row.type}</Badge>}
+                            <Badge 
+                              key={t} 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold whitespace-nowrap", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {t}
+                            </Badge>
+                          )) : (
+                            <Badge 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold whitespace-nowrap", TYPE_BADGE_COLORS[row.type] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {row.type}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="border-r align-top p-4 text-sm leading-relaxed">

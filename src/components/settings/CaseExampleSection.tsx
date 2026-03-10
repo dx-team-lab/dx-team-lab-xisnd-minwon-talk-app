@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { FILTER_OPTIONS, CASE_BADGE_COLORS, METHOD_BADGE_COLORS } from '@/lib/constants';
+import { FILTER_OPTIONS, CASE_BADGE_COLORS, METHOD_BADGE_COLORS, TYPE_BADGE_COLORS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 export default function CaseExampleSection() {
@@ -280,8 +280,21 @@ export default function CaseExampleSection() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {Array.isArray(c.type) ? c.type.map((t: string) => (
-                            <Badge key={t} variant="secondary" className="text-[10px] px-1">{t}</Badge>
-                          )) : <Badge variant="secondary" className="text-[10px] px-1">{c.type}</Badge>}
+                            <Badge 
+                              key={t} 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {t}
+                            </Badge>
+                          )) : (
+                            <Badge 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[c.type] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {c.type}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>{c.complainant}</TableCell>

@@ -16,7 +16,8 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { FILTER_OPTIONS } from '@/lib/constants';
+import { FILTER_OPTIONS, TYPE_BADGE_COLORS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function ResponseGuideSection() {
   const db = useFirestore();
@@ -223,8 +224,21 @@ export default function ResponseGuideSection() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {Array.isArray(g.type) ? g.type.map((t: string) => (
-                            <Badge key={t} variant="secondary" className="text-[10px] px-1">{t}</Badge>
-                          )) : <Badge variant="secondary" className="text-[10px] px-1">{g.type}</Badge>}
+                            <Badge 
+                              key={t} 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {t}
+                            </Badge>
+                          )) : (
+                            <Badge 
+                              variant="outline" 
+                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[g.type] || "bg-secondary text-secondary-foreground")}
+                            >
+                              {g.type}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="max-w-xs truncate">{g.cause}</TableCell>
