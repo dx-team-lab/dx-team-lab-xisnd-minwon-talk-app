@@ -39,11 +39,6 @@ export default function DashboardPage() {
     return filters.region.length > 0 || filters.phase.length > 0 || filters.type.length > 0;
   }, [filters.region, filters.phase, filters.type]);
 
-  // Check if any filter is active (for general result count or Cases)
-  const isAnyFilterActive = useMemo(() => {
-    return Object.values(filters).some(v => v.length > 0);
-  }, [filters]);
-
   // Firestore Data Fetching - Only fetch when user is authenticated
   const guidesQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -176,7 +171,8 @@ export default function DashboardPage() {
           onReset={resetFilters}
           resultCount={filteredGuides.length + filteredCases.length}
         />
-        <div className="grid grid-cols-1 gap-8 items-start">
+        {/* Layout Changed to Grid with 2 columns on larger screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <ResponsePlanTable 
             data={filteredGuides} 
             isLoading={isGuidesLoading} 
