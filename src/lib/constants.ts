@@ -1,4 +1,3 @@
-
 export const FILTER_OPTIONS = {
   region: {
     label: '지역/지구',
@@ -20,14 +19,14 @@ export const FILTER_OPTIONS = {
 
 export const BADGE_COLORS = {
   demandType: {
-    '재산 피해 보상': { bg: 'bg-emerald-100', text: 'text-emerald-700' },
-    '정신적 피해 보상': { bg: 'bg-blue-100', text: 'text-blue-700' },
-    '영업 피해 보상': { bg: 'bg-amber-100', text: 'text-amber-700' }
+    '재산 피해 보상': { bg: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+    '정신적 피해 보상': { bg: 'bg-blue-100 text-blue-700 border-blue-200' },
+    '영업 피해 보상': { bg: 'bg-amber-100 text-amber-700 border-amber-200' }
   },
   compensationMethod: {
-    '근태로': { bg: 'bg-rose-100', text: 'text-rose-700' },
-    '시설보수': { bg: 'bg-indigo-100', text: 'text-indigo-700' },
-    '현물보상': { bg: 'bg-teal-100', text: 'text-teal-700' }
+    '과태료': { bg: 'bg-rose-100 text-rose-700 border-rose-200' },
+    '시설보수': { bg: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+    '현물보상': { bg: 'bg-teal-100 text-teal-700 border-teal-200' }
   }
 } as const;
 

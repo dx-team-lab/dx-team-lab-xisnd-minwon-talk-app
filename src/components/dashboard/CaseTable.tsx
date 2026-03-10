@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,9 +7,8 @@ import { BADGE_COLORS, type DemandType, type CompensationMethod } from '@/lib/co
 import { cn } from '@/lib/utils';
 
 export default function CaseTable() {
-  // 요구사항(demands)을 배열로 변경하여 다중 선택 지원 및 데이터 통합
   const cases = [
-    { demands: ['재산 피해 보상'], date: '2019-05-29', progress: '종결', method: '근태로', amount: 1493590 },
+    { demands: ['재산 피해 보상'], date: '2019-05-29', progress: '종결', method: '과태료', amount: 1493590 },
     { demands: ['재산 피해 보상'], date: '2020-01-16', progress: '종결', method: '시설보수', amount: 2420000 },
     { demands: ['정신적 피해 보상'], date: '2021-10-29', progress: '종결', method: '현물보상', amount: 50000000 },
     { demands: ['정신적 피해 보상'], date: '2022-07-12', progress: '종결', method: '시설보수', amount: 3718000 },
@@ -54,9 +52,8 @@ export default function CaseTable() {
                         key={demand}
                         variant="outline"
                         className={cn(
-                          "border-none shadow-none py-1 px-2.5 whitespace-nowrap font-bold text-[11px]",
-                          BADGE_COLORS.demandType[demand as DemandType]?.bg || "bg-slate-100",
-                          BADGE_COLORS.demandType[demand as DemandType]?.text || "text-slate-700"
+                          "shadow-none py-1 px-2.5 whitespace-nowrap font-bold text-[11px] border",
+                          BADGE_COLORS.demandType[demand as DemandType]?.bg || "bg-slate-100 text-slate-700 border-slate-200"
                         )}
                       >
                         {demand}
@@ -76,9 +73,8 @@ export default function CaseTable() {
                     <Badge 
                       variant="outline"
                       className={cn(
-                        "border-none shadow-none font-bold",
-                        BADGE_COLORS.compensationMethod[item.method as CompensationMethod]?.bg || "bg-slate-100",
-                        BADGE_COLORS.compensationMethod[item.method as CompensationMethod]?.text || "text-slate-700"
+                        "shadow-none font-bold border",
+                        BADGE_COLORS.compensationMethod[item.method as CompensationMethod]?.bg || "bg-slate-100 text-slate-700 border-slate-200"
                       )}
                     >
                       {item.method}
