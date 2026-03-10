@@ -23,7 +23,7 @@ export default function CaseTable() {
   };
 
   return (
-    <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm">
+    <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm h-full">
       <CardHeader className="bg-white border-b py-4">
         <CardTitle className="text-xl font-headline flex items-center gap-2">
           <div className="h-5 w-1 bg-accent rounded-full" />
@@ -47,7 +47,7 @@ export default function CaseTable() {
               <TableRow key={idx} className="hover:bg-slate-50 transition-colors">
                 <TableCell>
                   {item.demand !== '-' && (
-                    <Badge className={`border-none shadow-none ${BADGE_COLORS.demandType[item.demand as DemandType].bg} ${BADGE_COLORS.demandType[item.demand as DemandType].text}`}>
+                    <Badge className={`border-none shadow-none py-1 px-3 whitespace-nowrap ${BADGE_COLORS.demandType[item.demand as DemandType].bg} ${BADGE_COLORS.demandType[item.demand as DemandType].text}`}>
                       {item.demand}
                     </Badge>
                   )}
