@@ -227,14 +227,14 @@ export default function ResponseGuideSection() {
                             <Badge 
                               key={t} 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
                             >
                               {t}
                             </Badge>
                           )) : (
                             <Badge 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[g.type] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[g.type] || "bg-secondary text-secondary-foreground")}
                             >
                               {g.type}
                             </Badge>

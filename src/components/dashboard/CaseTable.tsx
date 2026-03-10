@@ -49,19 +49,19 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                       {item.phase}
                     </TableCell>
                     <TableCell className="p-4 border-r">
-                      <div className="flex flex-col items-center gap-1">
+                      <div className="flex flex-col items-center gap-1.5">
                         {Array.isArray(item.type) ? item.type.map((t: string) => (
                           <Badge 
                             key={t} 
                             variant="outline" 
-                            className={cn("text-[9px] h-4 px-1 whitespace-nowrap font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                            className={cn("text-xs whitespace-nowrap font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
                           >
                             {t}
                           </Badge>
                         )) : (
                           <Badge 
                             variant="outline" 
-                            className={cn("text-[9px] h-4 px-1 whitespace-nowrap font-bold", TYPE_BADGE_COLORS[item.type] || "bg-secondary text-secondary-foreground")}
+                            className={cn("text-xs whitespace-nowrap font-bold", TYPE_BADGE_COLORS[item.type] || "bg-secondary text-secondary-foreground")}
                           >
                             {item.type}
                           </Badge>
@@ -72,7 +72,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                       {item.complainant}
                     </TableCell>
                     <TableCell className="p-4 border-r">
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1.5">
                         {Array.isArray(item.requestType) ? item.requestType.map((rt: string) => (
                           <Badge key={rt} variant="outline" className={cn("whitespace-nowrap font-bold w-fit", CASE_BADGE_COLORS[rt] || "")}>
                             {rt}
@@ -84,12 +84,12 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="p-4 border-r">
+                    <TableCell className="p-4 border-r text-center">
                       <Badge variant="outline" className={cn("whitespace-nowrap font-bold", METHOD_BADGE_COLORS[item.compensationStatus] || "")}>
                         {item.compensationStatus}
                       </Badge>
                     </TableCell>
-                    <TableCell className="p-4 text-right font-semibold text-slate-900 tabular-nums">
+                    <TableCell className="p-4 text-right font-semibold text-slate-900 tabular-nums whitespace-nowrap">
                       {item.compensationAmount?.toLocaleString() || '-'}
                     </TableCell>
                   </TableRow>

@@ -50,19 +50,19 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive }: R
                         {row.phase}
                       </TableCell>
                       <TableCell className="border-r text-center align-top p-4">
-                        <div className="flex flex-wrap justify-center gap-1">
+                        <div className="flex flex-wrap justify-center gap-1.5">
                           {Array.isArray(row.type) ? row.type.map((t: string) => (
                             <Badge 
                               key={t} 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold whitespace-nowrap", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold whitespace-nowrap", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
                             >
                               {t}
                             </Badge>
                           )) : (
                             <Badge 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold whitespace-nowrap", TYPE_BADGE_COLORS[row.type] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold whitespace-nowrap", TYPE_BADGE_COLORS[row.type] || "bg-secondary text-secondary-foreground")}
                             >
                               {row.type}
                             </Badge>

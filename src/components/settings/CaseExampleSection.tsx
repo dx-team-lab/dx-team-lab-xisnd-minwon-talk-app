@@ -283,14 +283,14 @@ export default function CaseExampleSection() {
                             <Badge 
                               key={t} 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
                             >
                               {t}
                             </Badge>
                           )) : (
                             <Badge 
                               variant="outline" 
-                              className={cn("text-[10px] px-1 font-bold", TYPE_BADGE_COLORS[c.type] || "bg-secondary text-secondary-foreground")}
+                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[c.type] || "bg-secondary text-secondary-foreground")}
                             >
                               {c.type}
                             </Badge>
@@ -306,7 +306,7 @@ export default function CaseExampleSection() {
                             </Badge>
                           )) : (
                             <Badge variant="outline" className={cn("font-bold", CASE_BADGE_COLORS[c.requestType] || "")}>
-                              {c.requestType}
+                              {t}
                             </Badge>
                           )}
                         </div>
