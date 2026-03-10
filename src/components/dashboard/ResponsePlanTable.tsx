@@ -116,25 +116,25 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive }: R
             <tr className="align-top">
               {/* 사전업무 */}
               <td className="p-3 border-r">
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">① 주변 환경 조사</p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                <div className="space-y-5">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">① 주변 환경 조사</p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 거주자 조사 <span className="text-[#6B7280]">(BM)</span></li>
                       <li>• 예상 소음도 <span className="text-[#6B7280]">(공사)</span></li>
                       <li>• 사전 건물 조사 <span className="text-[#6B7280]">(공사)</span></li>
                     </ul>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">② 환경 인허가<span className="text-[#6B7280]">(공무)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">② 환경 인허가<span className="text-[#6B7280]">(공무)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 비산먼지 신고</li>
                       <li>• 특정공사 신고</li>
                     </ul>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">③ 진행절차 <span className="text-[#6B7280]">(CM, 공무)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">③ 진행절차 <span className="text-[#6B7280]">(CM, 공무)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 민원 보상 예산</li>
                       <li>• 환경 대책 수립</li>
                       <li>• 착공 및 인허가</li>
@@ -145,25 +145,25 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive }: R
               
               {/* 민원접수 */}
               <td className="p-3 border-r">
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">① 민원 접수<span className="text-[#6B7280]">(최초)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                <div className="space-y-5">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">① 민원 접수<span className="text-[#6B7280]">(최초)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 대표번호, 지자체</li>
                       <li>• 초기 기록</li>
                       <li>• 긴급도 판단 <span className="text-[#6B7280]">(BM)</span></li>
                     </ul>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">② 분석 및 보고<span className="text-[#6B7280]">(BM)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">② 분석 및 보고<span className="text-[#6B7280]">(BM)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 면담 및 확인</li>
                       <li>• 원인 파악/보고</li>
                     </ul>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">③ 분류 및 지정<span className="text-[#6B7280]">(CM)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">③ 분류 및 지정<span className="text-[#6B7280]">(CM)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 일반/특이민원</li>
                     </ul>
                   </div>
@@ -172,49 +172,49 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive }: R
 
               {/* 민원대응 */}
               <td className="p-3 border-r">
-                <div className="space-y-2">
-                  <p className="text-[12px] font-bold leading-tight">① 내부 보고<span className="text-[#6B7280]">(→ CM)</span></p>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">② 공사협의<span className="text-[#6B7280]">(공사)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                <div className="space-y-4">
+                  <p className="text-[12px] font-bold leading-normal">① 내부 보고<span className="text-[#6B7280]">(→ CM)</span></p>
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">② 공사협의<span className="text-[#6B7280]">(공사)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 소음/먼지 대응</li>
                       <li>• 진동 민원 대응</li>
                     </ul>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">③ 기관협의<span className="text-[#6B7280]">(공무)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">③ 기관협의<span className="text-[#6B7280]">(공무)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 조치계획서</li>
                     </ul>
                   </div>
-                  <p className="text-[12px] font-bold leading-tight">④ 노조/언론 <span className="text-[#6B7280]">(공무/CM)</span></p>
-                  <p className="text-[12px] font-bold leading-tight">⑤ 거주민 협의 <span className="text-[#6B7280]">(BM)</span></p>
-                  <p className="text-[12px] font-bold leading-tight">⑥ 일지 관리 <span className="text-[#6B7280]">(BM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">④ 노조/언론 <span className="text-[#6B7280]">(공무/CM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">⑤ 거주민 협의 <span className="text-[#6B7280]">(BM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">⑥ 일지 관리 <span className="text-[#6B7280]">(BM)</span></p>
                 </div>
               </td>
 
               {/* 협상 전략 */}
               <td className="p-3 border-r">
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <p className="text-[12px] font-bold leading-tight">① 방안 결정<span className="text-[#6B7280]">(CM)</span></p>
-                    <ul className="text-[11px] text-slate-600 space-y-0.5 pl-1">
+                <div className="space-y-5">
+                  <div className="space-y-2.5">
+                    <p className="text-[12px] font-bold leading-normal">① 방안 결정<span className="text-[#6B7280]">(CM)</span></p>
+                    <ul className="text-[11px] text-slate-600 space-y-1.5 pl-1 leading-normal">
                       <li>• 작업시간 협상</li>
                       <li>• 시설보수 협상</li>
                       <li>• 현금보상 협상</li>
                       <li>• 분쟁/소송 <span className="text-[#6B7280]">(BM)</span></li>
                     </ul>
                   </div>
-                  <p className="text-[12px] font-bold leading-tight">② 보험접수<span className="text-[#6B7280]">(BM)</span></p>
-                  <p className="text-[12px] font-bold leading-tight">③ 회계처리<span className="text-[#6B7280]">(BM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">② 보험접수<span className="text-[#6B7280]">(BM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">③ 회계처리<span className="text-[#6B7280]">(BM)</span></p>
                 </div>
               </td>
 
               {/* 보상협의 */}
               <td className="p-3">
-                <div className="space-y-3">
-                  <p className="text-[12px] font-bold leading-tight">① 합의서 작성<span className="text-[#6B7280]">(BM)</span></p>
-                  <p className="text-[12px] font-bold leading-tight">② 보상 품의<span className="text-[#6B7280]">(공무)</span></p>
+                <div className="space-y-5">
+                  <p className="text-[12px] font-bold leading-normal">① 합의서 작성<span className="text-[#6B7280]">(BM)</span></p>
+                  <p className="text-[12px] font-bold leading-normal">② 보상 품의<span className="text-[#6B7280]">(공무)</span></p>
                 </div>
               </td>
             </tr>
