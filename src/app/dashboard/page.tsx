@@ -10,7 +10,6 @@ import HeroBanner from '@/components/dashboard/HeroBanner';
 import FilterBar from '@/components/dashboard/FilterBar';
 import ResponsePlanTable from '@/components/dashboard/ResponsePlanTable';
 import CaseTable from '@/components/dashboard/CaseTable';
-import AIAssistantDialog from '@/components/dashboard/AIAssistantDialog';
 import { Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
@@ -85,7 +84,6 @@ export default function DashboardPage() {
         <ResponsePlanTable />
         <CaseTable />
       </main>
-      <AIAssistantDialog />
     </div>
   );
 }
