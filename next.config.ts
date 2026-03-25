@@ -2,6 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'export',
+  basePath: '/dx-team-lab-xisnd-minwon-talk-app',
+  assetPrefix: '/dx-team-lab-xisnd-minwon-talk-app',
+  trailingSlash: true,
   images: { 
     unoptimized: true 
   },
