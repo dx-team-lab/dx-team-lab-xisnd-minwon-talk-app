@@ -203,7 +203,7 @@ export default function AuthPage() {
               </Button>
               
               <div className="flex items-center justify-between px-1">
-                <Link href="/forgot-password" size="sm" className="text-sm font-medium text-blue-600 hover:underline">
+                <Link href="/forgot-password" title="비밀번호 찾기" className="text-sm font-medium text-blue-600 hover:underline">
                   비밀번호를 잊으셨나요?
                 </Link>
                 <button 

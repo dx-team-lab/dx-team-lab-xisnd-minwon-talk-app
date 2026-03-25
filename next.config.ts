@@ -3,7 +3,7 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   output: 'export',
-  basePath: '/dx-team-lab-xisnd-minwon-talk-app',
+  trailingSlash: true,
   images: {
     unoptimized: true,
     remotePatterns: [
