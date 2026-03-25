@@ -171,8 +171,8 @@ export default function DashboardPage() {
           onReset={resetFilters}
           resultCount={filteredGuides.length + filteredCases.length}
         />
-        {/* Layout Changed to Grid with 2 columns on larger screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Layout Changed to Vertical Stack */}
+        <div className="flex flex-col gap-8">
           <ResponsePlanTable 
             data={filteredGuides} 
             isLoading={isGuidesLoading} 

@@ -19,7 +19,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
       <CardHeader className="bg-white border-b py-4">
         <CardTitle className="text-xl font-headline flex items-center gap-2">
           <div className="h-5 w-1 bg-accent rounded-full" />
-          사례
+          유사 사례
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
