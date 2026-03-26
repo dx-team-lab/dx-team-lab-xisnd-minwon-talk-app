@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import { useFirestore, useUser, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,6 +49,8 @@ export default function CaseExampleSection() {
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const casesQuery = useMemoFirebase(() => query(collection(db, 'caseExamples'), orderBy('createdAt', 'desc')), [db]);
   const { data: cases, isLoading } = useCollection(casesQuery);
@@ -143,6 +146,102 @@ export default function CaseExampleSection() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleExcelImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const data = XLSX.utils.sheet_to_json(sheet);
+
+          const mapRegion = (raw: string) => {
+            if (raw.includes('공업')) return '공업';
+            if (raw.includes('민감')) return '민감';
+            if (raw.includes('상업')) return '상업';
+            if (raw.includes('주거')) return '주거';
+            return raw;
+          };
+
+          const mapPhase = (raw: string) => {
+            if (raw.includes('착수') || raw.includes('착공전')) return '착공전';
+            if (raw.includes('철거') || raw.includes('토공')) return '토공';
+            if (raw.includes('골조')) return '골조';
+            if (raw.includes('마감')) return '마감';
+            if (raw.includes('준공')) return '준공';
+            return raw;
+          };
+
+          let successCount = 0;
+          for (const row of data as any[]) {
+            const rawOccurrenceDate = row['발생 일시'] || '';
+            let formattedDate = '';
+            if (rawOccurrenceDate) {
+              if (typeof rawOccurrenceDate === 'number') {
+                const date = new Date((rawOccurrenceDate - (25567 + 2)) * 86400 * 1000);
+                formattedDate = date.toISOString().split('T')[0];
+              } else {
+                formattedDate = String(rawOccurrenceDate).replace(/\./g, '-');
+              }
+            }
+
+            const payload = {
+              siteName: row['현장명'] || '',
+              region: mapRegion(row['지역'] || ''),
+              phase: mapPhase(row['단계'] || ''),
+              type: row['유형'] ? String(row['유형']).split(',').map(t => t.trim()) : [],
+              complaintContent: row['민원 내용'] || '',
+              complainant: row['민원인'] || '',
+              requestContent: row['요구사항'] ? String(row['요구사항']).split(',').map(t => t.trim()) : [],
+              occurrenceDate: formattedDate,
+              progress: row['진행경과'] || '접수',
+              compensationMethod: row['보상방식'] || '',
+              compensationAmount: Number(row['보상금액(원)']) || 0,
+              details: row['상세내용'] || '',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+              createdBy: user?.uid || 'system'
+            };
+            addDocumentNonBlocking(collection(db, 'cases'), payload);
+            successCount++;
+          }
+          toast({ title: "임포트 완료", description: `${successCount}개의 데이터가 Firestore에 등록되었습니다.` });
+        } catch (error) {
+          console.error("Parse error inside onload:", error);
+          toast({ title: "임포트 실패", description: "엑셀 파일 형식이 잘못되었거나 데이터를 파싱할 수 없습니다.", variant: "destructive" });
+        } finally {
+          setIsImporting(false);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+
+      reader.onerror = (error) => {
+        console.error("FileReader error:", error);
+        toast({ title: "임포트 실패", description: "엑셀 파일을 읽는 중 오류가 발생했습니다.", variant: "destructive" });
+        setIsImporting(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({ title: "임포트 실패", description: "엑셀 파일을 처리하는 중 오류가 발생했습니다.", variant: "destructive" });
+      setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleDeleteConfirm = () => {
     if (deleteConfirmId) {
       deleteDocumentNonBlocking(doc(db, 'caseExamples', deleteConfirmId));
@@ -155,11 +254,30 @@ export default function CaseExampleSection() {
     <div className="space-y-8">
       {/* Input Form */}
       <Card className="rounded-xl border-slate-200 shadow-sm">
-        <CardHeader className="border-b bg-slate-50/50">
+        <CardHeader className="border-b bg-slate-50/50 flex flex-row items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             {editingId ? <Edit2 className="h-5 w-5 text-amber-500" /> : <PlusCircle className="h-5 w-5 text-primary" />}
             사례 {editingId ? '수정' : '신규 등록'}
           </CardTitle>
+          <div className="flex items-center gap-2">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept=".xlsx, .xls" 
+              onChange={handleExcelImport} 
+            />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleExcelImportClick} 
+              disabled={isImporting}
+              className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+            >
+              {isImporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
+              엑셀 데이터 가져오기
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
