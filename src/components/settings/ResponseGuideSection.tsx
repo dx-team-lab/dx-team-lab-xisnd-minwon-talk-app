@@ -117,10 +117,18 @@ export default function ResponseGuideSection() {
       const sheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(sheet);
 
+      const mapRegion = (raw: string) => {
+        if (raw.includes('공업')) return '공업';
+        if (raw.includes('민감')) return '민감';
+        if (raw.includes('상업')) return '상업';
+        if (raw.includes('주거')) return '주거';
+        return raw;
+      };
+
       let successCount = 0;
       for (const row of data as any[]) {
         const payload = {
-          region: row['지역'] || '',
+          region: mapRegion(row['지역'] || ''),
           phase: row['단계'] || '',
           type: row['유형'] ? row['유형'].split(',').map((t: string) => t.trim()) : [],
           cause: row['원인'] || '',
@@ -136,6 +144,24 @@ export default function ResponseGuideSection() {
     } catch (error) {
       console.error('Import error:', error);
       toast({ title: "임포트 실패", description: "엑셀 파일을 읽는 중 오류가 발생했습니다.", variant: "destructive" });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!confirm('정말 모든 대응 방안 데이터를 삭제하시겠습니까?')) return;
+    setIsImporting(true);
+    try {
+      let count = 0;
+      for (const g of guides || []) {
+        deleteDocumentNonBlocking(doc(db, 'responseGuides', g.id));
+        count++;
+      }
+      toast({ title: "삭제 완료", description: `${count}개의 데이터를 삭제했습니다.` });
+    } catch (error) {
+      console.error('Clear error:', error);
+      toast({ title: "삭제 실패", description: "데이터 삭제 중 오류가 발생했습니다.", variant: "destructive" });
     } finally {
       setIsImporting(false);
     }
@@ -159,6 +185,15 @@ export default function ResponseGuideSection() {
           >
             {isImporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
             엑셀 데이터 가져오기
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleClearAll} 
+            disabled={isImporting}
+            className="text-slate-400 hover:text-destructive"
+          >
+            전체 삭제
           </Button>
         </CardHeader>
         <CardContent className="p-6">
