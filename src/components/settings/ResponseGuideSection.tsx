@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,54 +107,83 @@ export default function ResponseGuideSection() {
     }
   };
 
-  const handleExcelImport = async () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExcelImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     setIsImporting(true);
     try {
-      const response = await fetch('/지역-단계-유형-원인-조치방안_v1_7.xlsx');
-      const arrayBuffer = await response.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer);
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const data = XLSX.utils.sheet_to_json(sheet);
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const data = XLSX.utils.sheet_to_json(sheet);
 
-      const mapRegion = (raw: string) => {
-        if (raw.includes('공업')) return '공업';
-        if (raw.includes('민감')) return '민감';
-        if (raw.includes('상업')) return '상업';
-        if (raw.includes('주거')) return '주거';
-        return raw;
+          const mapRegion = (raw: string) => {
+            if (raw.includes('공업')) return '공업';
+            if (raw.includes('민감')) return '민감';
+            if (raw.includes('상업')) return '상업';
+            if (raw.includes('주거')) return '주거';
+            return raw;
+          };
+
+          const mapPhase = (raw: string) => {
+            if (raw.includes('착수') || raw.includes('착공전')) return '착공전';
+            if (raw.includes('철거') || raw.includes('토공')) return '토공';
+            if (raw.includes('골조')) return '골조';
+            if (raw.includes('마감')) return '마감';
+            if (raw.includes('준공')) return '준공';
+            return raw;
+          };
+
+          let successCount = 0;
+          for (const row of data as any[]) {
+            const payload = {
+              region: mapRegion(row['지역'] || ''),
+              phase: mapPhase(row['단계'] || ''),
+              type: row['유형'] ? row['유형'].split(',').map((t: string) => t.trim()) : [],
+              cause: row['원인'] || '',
+              action: row['조치방안(번호형)'] || '',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+              createdBy: user?.uid || 'system'
+            };
+            addDocumentNonBlocking(collection(db, 'responseGuides'), payload);
+            successCount++;
+          }
+          toast({ title: "임포트 완료", description: `${successCount}개의 데이터가 Firestore에 등록되었습니다.` });
+        } catch (error) {
+          console.error("Parse error inside onload:", error);
+          toast({ title: "임포트 실패", description: "엑셀 파일 형식이 잘못되었거나 데이터를 파싱할 수 없습니다.", variant: "destructive" });
+        } finally {
+          setIsImporting(false);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
       };
 
-      const mapPhase = (raw: string) => {
-        if (raw.includes('착수') || raw.includes('착공전')) return '착공전';
-        if (raw.includes('철거') || raw.includes('토공')) return '토공';
-        if (raw.includes('골조')) return '골조';
-        if (raw.includes('마감')) return '마감';
-        if (raw.includes('준공')) return '준공';
-        return raw;
+      reader.onerror = (error) => {
+        console.error("FileReader error:", error);
+        toast({ title: "임포트 실패", description: "엑셀 파일을 읽는 중 오류가 발생했습니다.", variant: "destructive" });
+        setIsImporting(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
       };
 
-      let successCount = 0;
-      for (const row of data as any[]) {
-        const payload = {
-          region: mapRegion(row['지역'] || ''),
-          phase: mapPhase(row['단계'] || ''),
-          type: row['유형'] ? row['유형'].split(',').map((t: string) => t.trim()) : [],
-          cause: row['원인'] || '',
-          action: row['조치방안(번호형)'] || '',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          createdBy: user?.uid || 'system'
-        };
-        addDocumentNonBlocking(collection(db, 'responseGuides'), payload);
-        successCount++;
-      }
-      toast({ title: "임포트 완료", description: `${successCount}개의 데이터가 Firestore에 등록되었습니다.` });
+      reader.readAsArrayBuffer(file);
     } catch (error) {
       console.error('Import error:', error);
-      toast({ title: "임포트 실패", description: "엑셀 파일을 읽는 중 오류가 발생했습니다.", variant: "destructive" });
-    } finally {
+      toast({ title: "임포트 실패", description: "엑셀 파일을 처리하는 중 오류가 발생했습니다.", variant: "destructive" });
       setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -185,10 +214,17 @@ export default function ResponseGuideSection() {
             {editingId ? <Edit2 className="h-5 w-5 text-amber-500" /> : <PlusCircle className="h-5 w-5 text-primary" />}
             대응 방안 {editingId ? '수정' : '신규 등록'}
           </CardTitle>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept=".xlsx, .xls" 
+            onChange={handleExcelImport} 
+          />
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={handleExcelImport} 
+            onClick={handleExcelImportClick} 
             disabled={isImporting}
             className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
           >
