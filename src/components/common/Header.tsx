@@ -46,7 +46,7 @@ export default function Header() {
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold">M</div>
-            <span className="text-xl font-headline font-bold text-primary">민원 커뮤니티</span>
+            <span className="text-xl font-headline font-bold text-primary">민원 대응 지식 플랫폼</span>
           </Link>
           
           {hasSettingsAccess && (
