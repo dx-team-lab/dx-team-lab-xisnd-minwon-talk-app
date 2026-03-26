@@ -1,8 +1,10 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TYPE_BADGE_COLORS } from '@/lib/constants';
@@ -33,15 +35,33 @@ interface ResponsePlanTableProps {
 }
 
 export default function ResponsePlanTable({ data, isLoading, isFilterActive }: ResponsePlanTableProps) {
-  const displayData = data && data.length > 0 ? data : [];
+  const [rowsPerPage, setRowsPerPage] = useState('10');
+
+  const filteredData = data && data.length > 0 ? data : [];
+  const displayData = rowsPerPage === 'all' ? filteredData : filteredData.slice(0, parseInt(rowsPerPage, 10));
 
   return (
     <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm h-full">
-      <CardHeader className="bg-white border-b py-4">
+      <CardHeader className="bg-white border-b py-4 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-xl font-headline flex items-center gap-2">
           <div className="h-5 w-1 bg-primary rounded-full" />
           대응 방안
         </CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-500">표시 개수</span>
+          <Select value={rowsPerPage} onValueChange={setRowsPerPage}>
+            <SelectTrigger className="w-[100px] h-8 text-xs bg-white border-slate-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10개</SelectItem>
+              <SelectItem value="20">20개</SelectItem>
+              <SelectItem value="50">50개</SelectItem>
+              <SelectItem value="100">100개</SelectItem>
+              <SelectItem value="all">전체</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent className="p-0 overflow-x-auto">
         {isLoading && isFilterActive ? (
