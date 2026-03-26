@@ -125,11 +125,20 @@ export default function ResponseGuideSection() {
         return raw;
       };
 
+      const mapPhase = (raw: string) => {
+        if (raw.includes('착수') || raw.includes('착공전')) return '착공전';
+        if (raw.includes('철거') || raw.includes('토공')) return '토공';
+        if (raw.includes('골조')) return '골조';
+        if (raw.includes('마감')) return '마감';
+        if (raw.includes('준공')) return '준공';
+        return raw;
+      };
+
       let successCount = 0;
       for (const row of data as any[]) {
         const payload = {
           region: mapRegion(row['지역'] || ''),
-          phase: row['단계'] || '',
+          phase: mapPhase(row['단계'] || ''),
           type: row['유형'] ? row['유형'].split(',').map((t: string) => t.trim()) : [],
           cause: row['원인'] || '',
           action: row['조치방안(번호형)'] || '',

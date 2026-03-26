@@ -6,7 +6,7 @@ export const FILTER_OPTIONS: Record<string, { label: string; options: string[] }
   },
   phase: {
     label: '단계',
-    options: ['전체', '착수전', '철거', '토공', '골조', '마감', '준공이후']
+    options: ['전체', '착공전', '토공', '골조', '마감', '준공']
   },
   type: {
     label: '유형',
