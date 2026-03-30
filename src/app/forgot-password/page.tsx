@@ -11,12 +11,14 @@ import { Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth } from '@/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const auth = useAuth();
 
@@ -28,10 +30,28 @@ export default function ForgotPasswordPage() {
     setError(null);
     try {
       await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "전송 성공",
+        description: "비밀번호 재설정 링크가 이메일로 전송되었습니다.",
+      });
+      setEmail('');
       setIsSent(true);
     } catch (err: any) {
       console.error("Password reset error:", err);
-      setError("이메일 전송 중 오류가 발생했습니다. 이메일 주소를 확인해 주세요.");
+      let errorMessage = "이메일 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+      
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = "가입되지 않은 이메일입니다.";
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = "유효하지 않은 이메일 형식입니다.";
+      }
+      
+      setError(errorMessage);
+      toast({
+        title: "전송 실패",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -97,7 +117,12 @@ export default function ForgotPasswordPage() {
                   disabled={isSubmitting}
                   className="w-full h-14 rounded-2xl bg-[#4F46E5] hover:bg-[#4338CA] text-lg font-bold shadow-lg shadow-blue-200 transition-all"
                 >
-                  {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "임시 비밀번호 전송"}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      전송 중...
+                    </>
+                  ) : "임시 비밀번호 전송"}
                 </Button>
                 
                 <p className="text-center text-slate-400 text-sm">

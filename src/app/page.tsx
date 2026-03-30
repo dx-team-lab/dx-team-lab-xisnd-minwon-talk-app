@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, User as UserIcon } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth, useUser, useFirestore, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase';
+import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -22,6 +23,9 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState('');
+
+  const { toast } = useToast();
 
   const auth = useAuth();
   const db = useFirestore();
@@ -46,7 +50,7 @@ export default function AuthPage() {
           await setDoc(userRef, {
             id: authUser.uid,
             email: authUser.email,
-            displayName: authUser.displayName || authUser.email?.split('@')[0],
+            displayName: name || authUser.displayName || authUser.email?.split('@')[0],
             role: 'manager',
             approved: false,
             createdAt: serverTimestamp(),
@@ -61,22 +65,53 @@ export default function AuthPage() {
       }
     });
     return () => unsubscribe();
-  }, [auth, db]);
+  }, [auth, db, name]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
+    if (!isLogin && !name) {
+      alert("이름을 입력해 주세요.");
+      return;
+    }
 
     setIsSubmitting(true);
-    try {
-      if (isLogin) {
-        initiateEmailSignIn(auth, email, password);
-      } else {
-        initiateEmailSignUp(auth, email, password);
-      }
-    } catch (error) {
+
+    const handleAuthError = (error: any) => {
       console.error("Authentication error:", error);
       setIsSubmitting(false);
+
+      let message = isLogin 
+        ? "로그인 중 오류가 발생했습니다. 다시 시도해 주세요." 
+        : "회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.";
+
+      if (error.code === 'auth/email-already-in-use') {
+        message = "이미 사용 중인 이메일입니다. 로그인을 시도해 주세요.";
+      } else if (error.code === 'auth/weak-password') {
+        message = "비밀번호는 6자 이상이어야 합니다.";
+      } else if (error.code === 'auth/invalid-email') {
+        message = "유효하지 않은 이메일 형식입니다.";
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        message = "이메일 또는 비밀번호가 올바르지 않습니다.";
+      } else if (error.code === 'auth/too-many-requests') {
+        message = "너무 많은 시도가 있었습니다. 잠시 후 다시 시도해 주세요.";
+      }
+
+      toast({
+        title: isLogin ? "로그인 실패" : "회원가입 실패",
+        description: message,
+        variant: "destructive",
+      });
+    };
+
+    try {
+      if (isLogin) {
+        initiateEmailSignIn(auth, email, password, handleAuthError);
+      } else {
+        initiateEmailSignUp(auth, email, password, handleAuthError);
+      }
+    } catch (error) {
+      handleAuthError(error);
     }
   };
 
@@ -131,6 +166,25 @@ export default function AuthPage() {
             </div>
 
             <div className="space-y-6">
+              {/* Name Input - Only for Signup */}
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-semibold text-slate-700">이름</Label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                    <Input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="홍길동"
+                      className="pl-12 h-14 rounded-2xl border-slate-200 focus:ring-primary focus:border-primary transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Email Input */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-semibold text-slate-700">이메일</Label>
