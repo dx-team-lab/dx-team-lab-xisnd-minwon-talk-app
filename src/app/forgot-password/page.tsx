@@ -68,10 +68,10 @@ export default function ForgotPasswordPage() {
           <div className="z-10">
             <h1 className="text-3xl font-bold leading-tight mb-4">
               비밀번호를 잊으셨나요?<br />
-              <span className="text-primary">임시 비밀번호로 계정을 재설정하세요!</span>
+              <span className="text-primary">이메일로 비밀번호를 재설정하세요!</span>
             </h1>
             <p className="text-slate-500 text-sm mb-8">
-              가입한 이메일을 입력하면 임시 비밀번호 링크를 보내드립니다.
+              가입한 이메일을 입력하면 비밀번호 재설정 링크를 보내드립니다.
             </p>
             
             <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-lg border border-slate-100 mt-4">
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       전송 중...
                     </>
-                  ) : "임시 비밀번호 전송"}
+                  ) : "비밀번호 재설정 링크 전송"}
                 </Button>
                 
                 <p className="text-center text-slate-400 text-sm">
