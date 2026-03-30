@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save, ExternalLink } from 'lucide-react';
+import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save, ExternalLink, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
 import {
@@ -267,6 +267,49 @@ export default function CaseExampleSection() {
     }
   };
 
+  const handleExcelDownload = () => {
+    console.log("사례 엑셀 다운로드 함수 실행됨");
+    if (!cases || cases.length === 0) {
+      toast({ title: "다운로드 실패", description: "다운로드할 데이터가 없습니다.", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const excelData = cases.map(c => ({
+        '현장명': c.siteName || '',
+        '지역': c.region || '',
+        '단계': c.phase || '',
+        '유형': Array.isArray(c.type) ? c.type.join(',') : (c.type || ''),
+        '민원 내용': c.complaintContent || '',
+        '민원인': c.complainant || '',
+        '요구사항': Array.isArray(c.requestContent) ? c.requestContent.join(',') : (c.requestContent || ''),
+        '발생 일시': c.occurrenceDate || '',
+        '진행경과': c.progress || '',
+        '보상방식': c.compensationMethod || c.compensationStatus || '',
+        '보상금액(원)': c.compensationAmount || 0,
+        '상세내용': c.details || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "사례");
+
+      const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const excelBase64 = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
+      const link = document.createElement('a');
+      link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${excelBase64}`;
+      link.download = `사례_데이터_${dateStr}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({ title: "다운로드 완료", description: "사례 데이터가 엑셀로 저장되었습니다." });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({ title: "다운로드 실패", description: "엑셀 파일 생성 중 오류가 발생했습니다.", variant: "destructive" });
+    }
+  };
+
   const handleClearAllConfirm = async () => {
     setIsImporting(true);
     try {
@@ -302,6 +345,15 @@ export default function CaseExampleSection() {
               accept=".xlsx, .xls"
               onChange={handleExcelImport}
             />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExcelDownload}
+              className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              엑셀 데이터 다운로드
+            </Button>
             <Button
               variant="outline"
               size="sm"

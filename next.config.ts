@@ -1,14 +1,15 @@
 import type { NextConfig } from 'next';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: '/dx-team-lab-xisnd-minwon-talk-app',
-  assetPrefix: '/dx-team-lab-xisnd-minwon-talk-app',
-  trailingSlash: true,
-  images: { 
-    unoptimized: true 
+  basePath: isProd ? '/xisnd-minwon-talk-app' : '',
+  assetPrefix: isProd ? '/xisnd-minwon-talk-app/' : '',
+  images: {
+    unoptimized: true,
   },
-  // Keep these as they are essential for the app's functionality
+  // Ensure build errors don't stop the export as previously configured
   typescript: {
     ignoreBuildErrors: true,
   },
