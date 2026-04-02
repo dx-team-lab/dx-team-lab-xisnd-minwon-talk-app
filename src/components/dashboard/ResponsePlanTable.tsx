@@ -1,14 +1,16 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TYPE_BADGE_COLORS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 // Sample data as requested
 const SAMPLE_RESPONSE_DATA = [
@@ -53,9 +55,45 @@ function stripNumbering(item: string): string {
 
 export default function ResponsePlanTable({ data, isLoading, isFilterActive, actionLinkDict = {} }: ResponsePlanTableProps) {
   const [rowsPerPage, setRowsPerPage] = useState('10');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredData = data && data.length > 0 ? data : [];
-  const displayData = rowsPerPage === 'all' ? filteredData : filteredData.slice(0, parseInt(rowsPerPage, 10));
+
+  // Reset to first page when data or rowsPerPage changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data, rowsPerPage]);
+
+  const itemsPerPage = rowsPerPage === 'all' ? filteredData.length : parseInt(rowsPerPage, 10);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
+  
+  const displayData = rowsPerPage === 'all' 
+    ? filteredData 
+    : filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  };
 
   return (
     <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm h-full">
@@ -173,6 +211,55 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
           </Table>
         )}
       </CardContent>
+      {rowsPerPage !== 'all' && totalPages > 1 && (
+        <CardFooter className="py-6 border-t flex justify-center items-center bg-slate-50/30">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-md border-slate-200 text-slate-600 disabled:opacity-30"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="flex items-center gap-1 mx-2">
+              {getPageNumbers().map((page, i) => (
+                typeof page === 'number' ? (
+                  <Button
+                    key={i}
+                    variant={currentPage === page ? "default" : "outline"}
+                    className={cn(
+                      "h-8 min-w-[32px] px-2 rounded-md text-sm font-medium transition-all",
+                      currentPage === page 
+                        ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600" 
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    )}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                ) : (
+                  <span key={i} className="px-2 text-slate-400 font-medium">
+                    {page}
+                  </span>
+                )
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-md border-slate-200 text-slate-600 disabled:opacity-30"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

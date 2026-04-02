@@ -3,11 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CASE_BADGE_COLORS, METHOD_BADGE_COLORS, TYPE_BADGE_COLORS } from '@/lib/constants';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface CaseTableProps {
   data: any[] | null;
@@ -16,9 +18,45 @@ interface CaseTableProps {
 
 export default function CaseTable({ data, isLoading }: CaseTableProps) {
   const [displayCount, setDisplayCount] = useState<number | 'all'>(10);
+  const [currentCasePage, setCurrentCasePage] = useState(1);
 
   const displayData = data || [];
-  const slicedData = displayCount === 'all' ? displayData : displayData.slice(0, displayCount);
+
+  // Reset to first page when data or displayCount changes
+  useEffect(() => {
+    setCurrentCasePage(1);
+  }, [data, displayCount]);
+
+  const itemsPerPage = displayCount === 'all' ? displayData.length : Number(displayCount);
+  const totalPages = Math.max(1, Math.ceil(displayData.length / itemsPerPage));
+  
+  const slicedData = displayCount === 'all' 
+    ? displayData 
+    : displayData.slice((currentCasePage - 1) * itemsPerPage, currentCasePage * itemsPerPage);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentCasePage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentCasePage >= totalPages - 3) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentCasePage - 1; i <= currentCasePage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  };
 
   return (
     <Card className="rounded-xl border-slate-200 overflow-hidden shadow-sm h-full">
@@ -170,6 +208,55 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
           </div>
         )}
       </CardContent>
+      {displayCount !== 'all' && totalPages > 1 && (
+        <CardFooter className="py-6 border-t flex justify-center items-center bg-slate-50/30">
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-md border-slate-200 text-slate-600 disabled:opacity-30"
+              onClick={() => setCurrentCasePage(prev => Math.max(1, prev - 1))}
+              disabled={currentCasePage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="flex items-center gap-1 mx-2">
+              {getPageNumbers().map((page, i) => (
+                typeof page === 'number' ? (
+                  <Button
+                    key={i}
+                    variant={currentCasePage === page ? "default" : "outline"}
+                    className={cn(
+                      "h-8 min-w-[32px] px-2 rounded-md text-sm font-medium transition-all",
+                      currentCasePage === page 
+                        ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600" 
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    )}
+                    onClick={() => setCurrentCasePage(page)}
+                  >
+                    {page}
+                  </Button>
+                ) : (
+                  <span key={i} className="px-2 text-slate-400 font-medium">
+                    {page}
+                  </span>
+                )
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-md border-slate-200 text-slate-600 disabled:opacity-30"
+              onClick={() => setCurrentCasePage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentCasePage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }
