@@ -173,7 +173,10 @@ export default function UserManagementPage() {
 
     try {
       const userRef = doc(db, 'users', userId);
-      updateDocumentNonBlocking(userRef, { displayName: tempName.trim() });
+      updateDocumentNonBlocking(userRef, { 
+        displayName: tempName.trim(),
+        name: tempName.trim() 
+      });
       toast({
         title: "수정 완료",
         description: "이름이 수정되었습니다.",
@@ -290,7 +293,7 @@ export default function UserManagementPage() {
                             </div>
                           </div>
                         ) : (
-                          <span>{u.displayName || '이름 없음'}</span>
+                          <span>{u.name || u.displayName || '이름 없음'}</span>
                         )}
                       </TableCell>
                       <TableCell className="text-slate-600">{u.email}</TableCell>

@@ -47,10 +47,12 @@ export default function AuthPage() {
         
         if (!userDoc.exists()) {
           // New user: Set default role to 'manager' (일반 권한) and approved to false
+          const finalName = name || authUser.displayName || authUser.email?.split('@')[0];
           await setDoc(userRef, {
             id: authUser.uid,
             email: authUser.email,
-            displayName: name || authUser.displayName || authUser.email?.split('@')[0],
+            displayName: finalName,
+            name: finalName,
             role: 'manager',
             approved: false,
             createdAt: serverTimestamp(),

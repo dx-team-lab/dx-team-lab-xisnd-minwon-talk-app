@@ -9,26 +9,40 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown, LogOut, User, Settings, Loader2, Users, SlidersHorizontal } from 'lucide-react';
-import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { LogOut, Settings, Loader2, Users, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { collection } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 
 export default function Header() {
   const auth = useAuth();
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  
+  const userProfileRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return doc(db, 'users', user.uid);
+  }, [db, user?.uid]);
 
-  const adminsQuery = useMemoFirebase(() => collection(db, 'roles_admin'), [db]);
-  const managersQuery = useMemoFirebase(() => collection(db, 'roles_manager'), [db]);
+  const { data: userProfile } = useDoc(userProfileRef);
+
+  const adminsQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'roles_admin');
+  }, [db]);
+  
+  const managersQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'roles_manager');
+  }, [db]);
   
   const { data: admins } = useCollection(adminsQuery);
   const { data: managers } = useCollection(managersQuery);
   
-  const isAdmin = user && admins ? admins.some(a => a.id === user.uid) : false;
-  const isManager = user && managers ? managers.some(m => m.id === user.uid) : false;
+  const isAdmin = !!(user && admins && admins.some(a => a.id === user.uid));
+  const isManager = !!(user && managers && managers.some(m => m.id === user.uid));
   const hasSettingsAccess = isAdmin || isManager;
 
   const handleLogout = async () => {
@@ -81,31 +95,43 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex flex-col items-end text-right">
+          <div className="hidden sm:flex items-center gap-3">
             {isUserLoading ? (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-slate-800">
+                    {userProfile?.name || userProfile?.displayName || user?.displayName || '사용자'}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    ({user?.email})
+                  </span>
+                </div>
+                
+                {isAdmin && (
+                  <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    관리자
+                  </span>
+                )}
+
+                <div className="flex items-center gap-1.5 ml-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleLogout}
+                    className="h-8 w-8 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    title="로그아웃"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             ) : (
-              <>
-                <span className="text-sm font-semibold">{user?.displayName || '사용자'}</span>
-                <span className="text-xs text-muted-foreground">{user?.email}</span>
-              </>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/">로그인</Link>
+              </Button>
             )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full" asChild>
-               <Link href="/dashboard/profile">
-                <User className="h-5 w-5" />
-               </Link>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-slate-500 border-slate-200 hover:text-destructive hover:border-destructive/20 hover:bg-destructive/5 transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              로그아웃
-            </Button>
           </div>
         </div>
       </div>

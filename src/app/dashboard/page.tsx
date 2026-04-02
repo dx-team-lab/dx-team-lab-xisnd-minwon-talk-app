@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
-import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection, useAuth } from '@/firebase';
 import { doc, collection, query, orderBy } from 'firebase/firestore';
 import Header from '@/components/common/Header';
 import FilterBar from '@/components/dashboard/FilterBar';
@@ -13,7 +13,6 @@ import CaseTable from '@/components/dashboard/CaseTable';
 import { Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
-import { useAuth } from '@/firebase';
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -224,7 +223,7 @@ export default function DashboardPage() {
     setSearchKeyword('');
   };
 
-  if (isUserLoading || isProfileLoading) {
+  if (isUserLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F0F4FF]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
