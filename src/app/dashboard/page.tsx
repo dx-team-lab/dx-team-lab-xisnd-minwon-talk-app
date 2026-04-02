@@ -7,7 +7,6 @@ import { format } from 'date-fns';
 import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
 import { doc, collection, query, orderBy } from 'firebase/firestore';
 import Header from '@/components/common/Header';
-import HeroBanner from '@/components/dashboard/HeroBanner';
 import FilterBar from '@/components/dashboard/FilterBar';
 import ResponsePlanTable from '@/components/dashboard/ResponsePlanTable';
 import CaseTable from '@/components/dashboard/CaseTable';
@@ -263,22 +262,18 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#F0F4FF]">
       <Header />
-      <HeroBanner />
-      <main className="container mx-auto px-4 py-8 space-y-12">
-        <div className="flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-slate-900 font-headline">현황판</h2>
-          <FilterBar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onRemoveFilter={removeFilter}
-            onReset={resetFilters}
-            guideCount={filteredGuides.length}
-            caseCount={filteredCases.length}
-            searchKeyword={searchKeyword}
-            onSearchChange={setSearchKeyword}
-            onDownload={handleDownload}
-          />
-        </div>
+      <main className="container mx-auto px-4 pt-6 pb-12 space-y-12">
+        <FilterBar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onRemoveFilter={removeFilter}
+          onReset={resetFilters}
+          guideCount={filteredGuides.length}
+          caseCount={filteredCases.length}
+          searchKeyword={searchKeyword}
+          onSearchChange={setSearchKeyword}
+          onDownload={handleDownload}
+        />
         {/* Layout Changed to Vertical Stack */}
         <div className="flex flex-col gap-8">
           <ResponsePlanTable

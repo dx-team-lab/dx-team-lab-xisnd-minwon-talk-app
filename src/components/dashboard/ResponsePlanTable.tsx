@@ -90,8 +90,8 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
                 <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[100px] text-sm">지역</TableHead>
                 <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[100px] text-sm">단계</TableHead>
                 <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[120px] text-sm">유형</TableHead>
-                <TableHead className="h-12 font-bold border-r text-slate-700 text-sm w-[250px]">원인</TableHead>
-                <TableHead className="h-12 font-bold text-slate-700 text-sm min-w-[300px]">조치방안</TableHead>
+                <TableHead className="h-12 font-bold border-r text-slate-700 text-sm w-[250px]">민원 상세</TableHead>
+                <TableHead className="h-12 font-bold text-slate-700 text-sm min-w-[300px]">민원 대응 지식</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -101,7 +101,7 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
                     <TableCell className="border-r text-center align-top p-4">
                       <Badge
                         variant="outline"
-                        className="bg-emerald-50 text-emerald-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                        className="bg-emerald-50 text-emerald-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                       >
                         {row.region}
                       </Badge>
@@ -109,7 +109,7 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
                     <TableCell className="border-r text-center align-top p-4">
                       <Badge
                         variant="outline"
-                        className="bg-orange-50 text-orange-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                        className="bg-orange-50 text-orange-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                       >
                         {row.phase}
                       </Badge>
@@ -120,14 +120,14 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
                           <Badge
                             key={t}
                             variant="outline"
-                            className="bg-blue-50 text-blue-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                            className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                           >
                             {t}
                           </Badge>
                         )) : (
                           <Badge
                             variant="outline"
-                            className="bg-blue-50 text-blue-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                            className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                           >
                             {row.type}
                           </Badge>

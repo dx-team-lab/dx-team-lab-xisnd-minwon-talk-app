@@ -24,7 +24,7 @@ export default function ResponseGuideSection() {
   const db = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     region: '',
     phase: '',
@@ -63,7 +63,7 @@ export default function ResponseGuideSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { region, phase, type, cause, action } = formData;
-    
+
     if (!region || !phase || !type.length || !cause || !action) {
       toast({ title: "입력 오류", description: "필수 항목을 모두 입력해주세요.", variant: "destructive" });
       return;
@@ -122,7 +122,7 @@ export default function ResponseGuideSection() {
     setIsImporting(true);
     try {
       const reader = new FileReader();
-      
+
       reader.onload = async (event) => {
         try {
           const arrayBuffer = event.target?.result as ArrayBuffer;
@@ -220,7 +220,7 @@ export default function ResponseGuideSection() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       toast({ title: "다운로드 완료", description: "대응 방안 데이터가 엑셀로 저장되었습니다." });
     } catch (error) {
       console.error('Download error:', error);
@@ -256,36 +256,36 @@ export default function ResponseGuideSection() {
             대응 방안 {editingId ? '수정' : '신규 등록'}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              accept=".xlsx, .xls" 
-              onChange={handleExcelImport} 
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".xlsx, .xls"
+              onChange={handleExcelImport}
             />
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleExcelDownload}
               className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
             >
               <Download className="h-4 w-4 mr-2" />
               엑셀 데이터 다운로드
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExcelImportClick} 
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExcelImportClick}
               disabled={isImporting}
               className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
             >
               {isImporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlusCircle className="h-4 w-4 mr-2" />}
               엑셀 데이터 가져오기
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowDeleteAllConfirm(true)} 
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDeleteAllConfirm(true)}
               disabled={isImporting || isDeletingAll}
               className="text-slate-400 hover:text-destructive"
             >
@@ -321,14 +321,14 @@ export default function ResponseGuideSection() {
                     </Select>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-600">유형 * (복수 선택 가능)</label>
                   <div className="flex flex-wrap gap-4 p-3 bg-slate-50 rounded-lg border">
                     {FILTER_OPTIONS.type.options.filter(o => o !== '전체').map(o => (
                       <div key={o} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`type-guide-${o}`} 
+                        <Checkbox
+                          id={`type-guide-${o}`}
                           checked={formData.type.includes(o)}
                           onCheckedChange={() => toggleType(o)}
                         />
@@ -341,18 +341,18 @@ export default function ResponseGuideSection() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">원인 *</label>
-                  <Textarea 
-                    placeholder="민원 발생 원인을 상세히 입력하세요" 
+                  <label className="text-sm font-bold text-slate-600">민원 상세 *</label>
+                  <Textarea
+                    placeholder="민원 발생 원인을 상세히 입력하세요"
                     value={formData.cause}
                     onChange={(e) => handleInputChange('cause', e.target.value)}
                     className="min-h-[80px]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">조치사항 *</label>
-                  <Textarea 
-                    placeholder="대응 조치사항을 입력하세요" 
+                  <label className="text-sm font-bold text-slate-600">민원 대응 지식 *</label>
+                  <Textarea
+                    placeholder="대응 조치사항을 입력하세요"
                     value={formData.action}
                     onChange={(e) => handleInputChange('action', e.target.value)}
                     className="min-h-[80px]"
@@ -388,8 +388,8 @@ export default function ResponseGuideSection() {
                   <TableHead className="w-[100px]">지역</TableHead>
                   <TableHead className="w-[100px]">단계</TableHead>
                   <TableHead className="w-[150px]">유형</TableHead>
-                  <TableHead>원인</TableHead>
-                  <TableHead>조치사항</TableHead>
+                  <TableHead>민원 상세</TableHead>
+                  <TableHead>민원 대응 지식</TableHead>
                   <TableHead className="text-right w-[120px]">관리</TableHead>
                 </TableRow>
               </TableHeader>
@@ -402,16 +402,16 @@ export default function ResponseGuideSection() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {Array.isArray(g.type) ? g.type.map((t: string) => (
-                            <Badge 
-                              key={t} 
-                              variant="outline" 
+                            <Badge
+                              key={t}
+                              variant="outline"
                               className={cn("text-xs font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
                             >
                               {t}
                             </Badge>
                           )) : (
-                            <Badge 
-                              variant="outline" 
+                            <Badge
+                              variant="outline"
                               className={cn("text-xs font-bold", TYPE_BADGE_COLORS[g.type] || "bg-secondary text-secondary-foreground")}
                             >
                               {g.type}
@@ -444,7 +444,7 @@ export default function ResponseGuideSection() {
         </CardContent>
       </Card>
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
         onConfirm={handleDeleteConfirm}

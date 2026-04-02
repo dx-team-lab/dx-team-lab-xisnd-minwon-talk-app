@@ -72,7 +72,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                       <TableCell className="border-r text-center align-top p-4">
                         <Badge
                           variant="outline"
-                          className="bg-emerald-50 text-emerald-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                          className="bg-emerald-50 text-emerald-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                         >
                           {item.region}
                         </Badge>
@@ -80,7 +80,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                       <TableCell className="border-r text-center align-top p-4">
                         <Badge
                           variant="outline"
-                          className="bg-orange-50 text-orange-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                          className="bg-orange-50 text-orange-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                         >
                           {item.phase}
                         </Badge>
@@ -91,14 +91,14 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                             <Badge
                               key={t}
                               variant="outline"
-                              className="bg-blue-50 text-blue-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                             >
                               {t}
                             </Badge>
                           )) : (
                             <Badge
                               variant="outline"
-                              className="bg-blue-50 text-blue-700 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5"
+                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                             >
                               {item.type}
                             </Badge>
@@ -111,11 +111,11 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                       <TableCell className="align-top p-4 border-r">
                         <div className="flex flex-wrap gap-1.5">
                           {Array.isArray(item.requestContent) ? item.requestContent.map((rt: string) => (
-                            <Badge key={rt} variant="outline" className="bg-rose-50 text-rose-600 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5">
+                            <Badge key={rt} variant="outline" className="bg-rose-50 text-rose-600 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1">
                               {rt}
                             </Badge>
                           )) : (
-                            <Badge variant="outline" className="bg-rose-50 text-rose-600 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5">
+                            <Badge variant="outline" className="bg-rose-50 text-rose-600 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1">
                               {item.requestContent}
                             </Badge>
                           )}
@@ -125,7 +125,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                         <Badge 
                           variant="outline" 
                           className={cn(
-                            "text-xs font-bold border-none rounded-full px-2.5 py-0.5 whitespace-nowrap",
+                            "text-sm font-bold border-none rounded-full px-3 py-1 whitespace-nowrap",
                             item.progress === '종결' ? "bg-slate-100 text-slate-600" :
                             item.progress === '진행' ? "bg-blue-50 text-blue-600" :
                             "bg-amber-50 text-amber-600"
@@ -135,7 +135,7 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                         </Badge>
                       </TableCell>
                       <TableCell className="align-top p-4 border-r text-center">
-                        <Badge variant="outline" className="bg-teal-50 text-teal-600 border-none rounded-full text-xs font-bold whitespace-nowrap px-2.5 py-0.5">
+                        <Badge variant="outline" className="bg-teal-50 text-teal-600 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1">
                           {item.compensationMethod}
                         </Badge>
                       </TableCell>
