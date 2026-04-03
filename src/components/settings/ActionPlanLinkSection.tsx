@@ -224,9 +224,9 @@ export default function ActionPlanLinkSection() {
     <div className="space-y-8">
       {/* Input Form */}
       <Card className="rounded-xl border-slate-200 shadow-sm">
-        <CardHeader className="border-b bg-slate-50/50 flex flex-row items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            {editingId ? <Edit2 className="h-5 w-5 text-amber-500" /> : <PlusCircle className="h-5 w-5 text-primary" />}
+        <CardHeader className="border-b bg-white py-4 flex flex-row items-center justify-between">
+          <CardTitle className="text-xl font-headline flex items-center gap-2">
+            <div className="h-5 w-1 bg-accent rounded-full" />
             조치방안 링크 {editingId ? '수정' : '등록'}
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -317,57 +317,64 @@ export default function ActionPlanLinkSection() {
 
       {/* Table List */}
       <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b bg-slate-50/50">
-          <CardTitle className="text-lg">조치방안 링크 목록</CardTitle>
+        <CardHeader className="border-b bg-white py-4">
+          <CardTitle className="text-xl font-headline flex items-center gap-2">
+            <div className="h-5 w-1 bg-accent rounded-full" />
+            조치방안 링크 목록
+          </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
-            <Table>
-              <TableHeader className="bg-slate-50">
+            <Table className="border-collapse min-w-[1000px]">
+              <TableHeader className="bg-slate-50 border-b">
                 <TableRow>
-                  <TableHead className="w-[250px]">제목</TableHead>
-                  <TableHead className="w-[200px]">유형</TableHead>
-                  <TableHead>URL</TableHead>
-                  <TableHead className="text-right w-[80px]">관리</TableHead>
+                  <TableHead className="h-12 font-bold text-slate-700 border-r text-sm px-4 w-[250px]">제목</TableHead>
+                  <TableHead className="h-12 font-bold text-slate-700 text-center border-r text-sm w-[180px]">유형</TableHead>
+                  <TableHead className="h-12 font-bold text-slate-700 border-r text-sm px-4">URL</TableHead>
+                  <TableHead className="h-12 font-bold text-slate-700 text-center text-sm w-[100px]">관리</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {links && links.length > 0 ? (
                   links.map((l) => (
-                    <TableRow key={l.id} className="hover:bg-slate-50">
-                      <TableCell className="font-medium text-slate-700">{l.title}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {Array.isArray(l.types) && l.types.map((t: string) => (
+                    <TableRow key={l.id} className="hover:bg-slate-50/50 transition-colors">
+                      <TableCell className="border-r align-top p-4 font-bold text-slate-700">{l.title}</TableCell>
+                      <TableCell className="border-r text-center align-top p-4">
+                        <div className="flex flex-wrap justify-center gap-1.5">
+                          {Array.isArray(l.types) && l.types.length > 0 ? l.types.map((t: string) => (
                             <Badge
                               key={t}
                               variant="outline"
-                              className={cn("text-[10px] font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                             >
                               {t}
                             </Badge>
-                          ))}
-                          {(!l.types || l.types.length === 0) && <span className="text-slate-400 text-xs">-</span>}
+                          )) : (
+                            <span className="text-slate-400 text-xs">-</span>
+                          )}
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-[400px] truncate">
-                        {l.url?.startsWith('http') ? (
-                          <a
-                            href={l.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            {l.url} <ExternalLink className="h-3 w-3 shrink-0" />
-                          </a>
-                        ) : (
-                          <span className="text-slate-500">{l.url || '-'}</span>
-                        )}
+                      <TableCell className="border-r align-top p-4">
+                        <div className="max-w-md truncate">
+                          {l.url?.startsWith('http') ? (
+                            <a
+                              href={l.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline flex items-center gap-1 text-sm font-medium"
+                              title={l.url}
+                            >
+                              {l.url} <ExternalLink className="h-3 w-3 shrink-0" />
+                            </a>
+                          ) : (
+                            <span className="text-slate-500 text-sm">{l.url || '-'}</span>
+                          )}
+                        </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
+                      <TableCell className="align-top p-4 text-center">
+                        <div className="flex justify-center gap-1">
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(l)} className="text-slate-400 hover:text-primary">
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -380,7 +387,7 @@ export default function ActionPlanLinkSection() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-12 text-slate-400">등록된 조치방안 링크가 없습니다.</TableCell>
+                    <TableCell colSpan={4} className="text-center py-20 text-slate-400">등록된 조치방안 링크가 없습니다.</TableCell>
                   </TableRow>
                 )}
               </TableBody>

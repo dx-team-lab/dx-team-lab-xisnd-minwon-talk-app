@@ -20,6 +20,17 @@ import { FILTER_OPTIONS, TYPE_BADGE_COLORS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 
+// Parse action text like "1) 통제원 배치\n2) 외곽 대기 유도" into array of items
+function parseActionItems(action: string): string[] {
+  if (!action) return [];
+  // Split by newline or by numbered pattern like "1) ", "2) "
+  const items = action.split(/\n/).flatMap(line => {
+    // Further split if multiple numbered items on same line
+    return line.split(/(?=\d+\))/).map(s => s.trim()).filter(Boolean);
+  });
+  return items;
+}
+
 export default function ResponseGuideSection() {
   const db = useFirestore();
   const { user } = useUser();
@@ -375,54 +386,81 @@ export default function ResponseGuideSection() {
 
       {/* Table List */}
       <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b bg-slate-50/50">
-          <CardTitle className="text-lg">대응 방안 목록</CardTitle>
+        <CardHeader className="border-b bg-white py-4">
+          <CardTitle className="text-xl font-headline flex items-center gap-2">
+            <div className="h-5 w-1 bg-primary rounded-full" />
+            대응 방안 목록
+          </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
-            <Table>
-              <TableHeader className="bg-slate-50">
+            <Table className="border-collapse min-w-[800px]">
+              <TableHeader className="bg-slate-50 border-b">
                 <TableRow>
-                  <TableHead className="w-[100px]">지역</TableHead>
-                  <TableHead className="w-[100px]">단계</TableHead>
-                  <TableHead className="w-[150px]">유형</TableHead>
-                  <TableHead>민원 상세</TableHead>
-                  <TableHead>민원 대응 지식</TableHead>
-                  <TableHead className="text-right w-[120px]">관리</TableHead>
+                  <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[100px] text-sm">지역</TableHead>
+                  <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[100px] text-sm">단계</TableHead>
+                  <TableHead className="h-12 font-bold border-r text-slate-700 text-center w-[120px] text-sm">유형</TableHead>
+                  <TableHead className="h-12 font-bold border-r text-slate-700 text-sm w-[250px]">민원 상세</TableHead>
+                  <TableHead className="h-12 font-bold border-r text-slate-700 text-sm min-w-[300px]">민원 대응 지식</TableHead>
+                  <TableHead className="h-12 font-bold text-slate-700 text-sm text-center w-[120px]">관리</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {guides && guides.length > 0 ? (
                   guides.map((g) => (
-                    <TableRow key={g.id} className="hover:bg-slate-50">
-                      <TableCell className="font-medium">{g.region}</TableCell>
-                      <TableCell>{g.phase}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
+                    <TableRow key={g.id} className="hover:bg-slate-50/50 transition-colors">
+                      <TableCell className="border-r text-center align-top p-4">
+                        <Badge
+                          variant="outline"
+                          className="bg-emerald-50 text-emerald-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
+                        >
+                          {g.region}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="border-r text-center align-top p-4">
+                        <Badge
+                          variant="outline"
+                          className="bg-orange-50 text-orange-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
+                        >
+                          {g.phase}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="border-r text-center align-top p-4">
+                        <div className="flex flex-wrap justify-center gap-1.5">
                           {Array.isArray(g.type) ? g.type.map((t: string) => (
                             <Badge
                               key={t}
                               variant="outline"
-                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[t] || "bg-secondary text-secondary-foreground")}
+                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                             >
                               {t}
                             </Badge>
                           )) : (
                             <Badge
                               variant="outline"
-                              className={cn("text-xs font-bold", TYPE_BADGE_COLORS[g.type] || "bg-secondary text-secondary-foreground")}
+                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
                             >
                               {g.type}
                             </Badge>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">{g.cause}</TableCell>
-                      <TableCell className="max-w-xs truncate">{g.action}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
+                      <TableCell className="border-r align-top p-4 text-sm leading-relaxed text-slate-700 font-medium">
+                        {g.cause}
+                      </TableCell>
+                      <TableCell className="border-r align-top p-4 text-sm leading-relaxed text-slate-600">
+                        <div className="flex flex-col gap-1">
+                          {parseActionItems(g.action).map((item, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                              <span className="whitespace-pre-wrap">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-top p-4 text-center">
+                        <div className="flex justify-center gap-1">
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(g)} className="text-slate-400 hover:text-primary">
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -435,7 +473,9 @@ export default function ResponseGuideSection() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-slate-400">등록된 대응 방안이 없습니다.</TableCell>
+                    <TableCell colSpan={6} className="text-center py-20 text-slate-400">
+                      등록된 대응 방안이 없습니다.
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
