@@ -11,6 +11,7 @@ import { Loader2, Settings2 } from 'lucide-react';
 import ResponseGuideSection from '@/components/settings/ResponseGuideSection';
 import CaseExampleSection from '@/components/settings/CaseExampleSection';
 import ActionPlanLinkSection from '@/components/settings/ActionPlanLinkSection';
+import ResponseProcedureSection from '@/components/settings/ResponseProcedureSection';
 
 export default function SystemSettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -68,7 +69,7 @@ export default function SystemSettingsPage() {
         </div>
 
         <Tabs defaultValue="response" className="w-full">
-          <TabsList className="bg-white border w-full md:w-auto grid grid-cols-3 md:inline-flex rounded-xl p-1 h-auto">
+          <TabsList className="bg-white border w-full md:w-auto grid grid-cols-2 lg:grid-cols-4 rounded-xl p-1 h-auto">
             <TabsTrigger value="response" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               대응 방안
             </TabsTrigger>
@@ -77,6 +78,9 @@ export default function SystemSettingsPage() {
             </TabsTrigger>
             <TabsTrigger value="actionLinks" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               조치방안(링크)
+            </TabsTrigger>
+            <TabsTrigger value="procedure" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
+              민원 대응 절차 관리
             </TabsTrigger>
           </TabsList>
           
@@ -89,6 +93,9 @@ export default function SystemSettingsPage() {
             </TabsContent>
             <TabsContent value="actionLinks">
               <ActionPlanLinkSection />
+            </TabsContent>
+            <TabsContent value="procedure">
+              <ResponseProcedureSection />
             </TabsContent>
           </div>
         </Tabs>

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   output: 'export',
   basePath: isProd ? '/xisnd-minwon-talk-app' : '',
   assetPrefix: isProd ? '/xisnd-minwon-talk-app/' : '',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
