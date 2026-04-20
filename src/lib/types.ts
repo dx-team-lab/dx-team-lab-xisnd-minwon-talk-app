@@ -15,6 +15,14 @@ export interface Site {
   order: number;
 }
 
+export interface SiteImage {
+  id: string;
+  base64: string;
+  fileName: string;
+  order: number;
+  createdAt: Timestamp;
+}
+
 export interface UserProfile {
   id: string;
   email: string;

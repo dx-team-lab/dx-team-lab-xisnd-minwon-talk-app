@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
-import { collection, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, query, orderBy, deleteDoc, getDocs, addDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save } from 'lucide-react';
+import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { Site } from '@/lib/types';
+import { Site, SiteImage } from '@/lib/types';
+import { compressImageToBase64 } from '@/lib/imageUtils';
 
 const REGION_OPTIONS = [
   '서울', '경기도', '인천', '대전', '대구', '부산', '울산', '광주', '세종', 
@@ -43,6 +44,10 @@ export default function SiteManagementSection() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  
+  const [images, setImages] = useState<{fileName: string, base64: string}[]>([]);
+  const [existingImages, setExistingImages] = useState<SiteImage[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const sitesQuery = useMemoFirebase(() => query(collection(db, 'sites'), orderBy('order', 'asc')), [db]);
   const { data: sites, isLoading } = useCollection(sitesQuery);
@@ -63,9 +68,51 @@ export default function SiteManagementSection() {
       order: sites ? sites.length : 0
     });
     setEditingId(null);
+    setImages([]);
+    setExistingImages([]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const remainingQuota = 5 - existingImages.length - images.length;
+      const filesToProcess = newFiles.slice(0, remainingQuota);
+      
+      setIsUploading(true);
+      try {
+        const compressed = await Promise.all(
+          filesToProcess.map(async file => {
+            const base64 = await compressImageToBase64(file);
+            return { fileName: file.name, base64 };
+          })
+        );
+        setImages(prev => [...prev, ...compressed]);
+      } catch (e) {
+        console.error(e);
+        toast({ title: '오류', description: '이미지 압축 중 오류가 발생했습니다.', variant: 'destructive' });
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const removeNewImage = (idx: number) => {
+    setImages(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const removeExistingImage = async (imageId: string) => {
+    if (!editingId) return;
+    try {
+      await deleteDoc(doc(db, `sites/${editingId}/siteImages`, imageId));
+      setExistingImages(prev => prev.filter(img => img.id !== imageId));
+      toast({ title: '이미지 삭제', description: '기존 이미지가 삭제되었습니다.' });
+    } catch (e) {
+      console.error(e);
+      toast({ title: '오류', description: '이미지 삭제에 실패했습니다.', variant: 'destructive' });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { region, siteName, phase, completedCount = 0, inProgressCount = 0 } = formData;
 
@@ -79,6 +126,8 @@ export default function SiteManagementSection() {
       return;
     }
 
+    setIsUploading(true);
+
     const payload = {
       ...formData,
       completedCount: Number(completedCount),
@@ -88,21 +137,43 @@ export default function SiteManagementSection() {
       updatedBy: user?.uid
     };
 
-    if (editingId) {
-      updateDocumentNonBlocking(doc(db, 'sites', editingId), payload);
-      toast({ title: "성공", description: "현장 정보가 수정되었습니다." });
-    } else {
-      addDocumentNonBlocking(collection(db, 'sites'), {
-        ...payload,
-        createdAt: serverTimestamp(),
-        createdBy: user?.uid
-      });
-      toast({ title: "성공", description: "현장 정보가 등록되었습니다." });
+    try {
+      let targetSiteId = editingId;
+      if (editingId) {
+        updateDocumentNonBlocking(doc(db, 'sites', editingId), payload);
+        toast({ title: "성공", description: "현장 정보가 수정되었습니다." });
+      } else {
+        const docRef = await addDoc(collection(db, 'sites'), {
+          ...payload,
+          createdAt: serverTimestamp(),
+          createdBy: user?.uid
+        });
+        targetSiteId = docRef.id;
+        toast({ title: "성공", description: "현장 정보가 등록되었습니다." });
+      }
+      
+      // Handle new subcollection images
+      if (targetSiteId && images.length > 0) {
+        for (let i = 0; i < images.length; i++) {
+          await addDoc(collection(db, `sites/${targetSiteId}/siteImages`), {
+            base64: images[i].base64,
+            fileName: images[i].fileName,
+            order: existingImages.length + i,
+            createdAt: serverTimestamp()
+          });
+        }
+      }
+      
+      setIsUploading(false);
+      handleReset();
+    } catch (e) {
+      console.error(e);
+      toast({ title: '오류', description: '현장 정보를 저장하는 중 오류가 발생했습니다.', variant: 'destructive' });
+      setIsUploading(false);
     }
-    handleReset();
   };
 
-  const handleEdit = (site: Site) => {
+  const handleEdit = async (site: Site) => {
     setFormData({
       region: site.region,
       regionType: site.regionType,
@@ -114,11 +185,30 @@ export default function SiteManagementSection() {
       order: site.order
     });
     setEditingId(site.id);
+    setImages([]);
+    
+    // Fetch existing images from subcollection
+    const imagesQuery = query(collection(db, `sites/${site.id}/siteImages`), orderBy('order', 'asc'));
+    getDocs(imagesQuery).then(snap => {
+      setExistingImages(snap.docs.map(d => ({ id: d.id, ...d.data() } as SiteImage)));
+    });
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteConfirmId) {
+      try {
+        // Cascade delete subcollection images
+        const imagesQuery = query(collection(db, `sites/${deleteConfirmId}/siteImages`));
+        const snap = await getDocs(imagesQuery);
+        for (const docSnap of snap.docs) {
+          await deleteDoc(docSnap.ref);
+        }
+      } catch (e) {
+        console.warn('Failed to delete subcollection images', e);
+      }
+      
       deleteDocumentNonBlocking(doc(db, 'sites', deleteConfirmId));
       toast({ title: "삭제 완료", description: "현장 정보가 삭제되었습니다." });
       setDeleteConfirmId(null);
@@ -216,14 +306,42 @@ export default function SiteManagementSection() {
                 />
               </div>
 
-              <div className="space-y-2 lg:col-span-2">
-                <label className="text-sm font-bold text-slate-600">주요 내용</label>
+              <div className="space-y-2 lg:col-span-2 text-sm">
+                <label className="font-bold text-slate-600">주요 내용</label>
                 <Textarea
                   placeholder="주요 내용을 입력하세요"
                   value={formData.mainContent}
                   onChange={(e) => handleInputChange('mainContent', e.target.value)}
                   className="min-h-[80px]"
                 />
+              </div>
+
+              <div className="space-y-2 lg:col-span-3 pb-2 z-10 w-full relative h-[border-box]">
+                <label className="text-sm font-bold text-slate-600 block">관련 이미지 첨부 (최대 5장)</label>
+                <div className="border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 transition-colors rounded-xl p-6 text-center cursor-pointer relative">
+                  <Input type="file" multiple accept="image/jpeg, image/png, image/gif, image/webp" onChange={handleImageChange} disabled={isUploading || (images.length + existingImages.length) >= 5} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <p className="text-sm text-slate-600">이미지를 드래그하여 놓거나 클릭하여 선택하세요 (최대 5장, JPG/PNG 형식만)</p>
+                </div>
+                {(images.length > 0 || existingImages.length > 0) && (
+                  <div className="flex flex-wrap gap-4 mt-4 p-4 border rounded-lg bg-slate-50 relative">
+                    {existingImages.map((img, idx) => (
+                      <div key={`existing-${img.id || idx}`} className="relative group w-24 h-24 border rounded shadow-sm bg-white overflow-hidden">
+                        <img src={img.base64} alt={`기존 첨부 ${idx}`} className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => removeExistingImage(img.id)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {images.map((img, idx) => (
+                      <div key={`new-${idx}`} className="relative group w-24 h-24 border rounded shadow-sm bg-white overflow-hidden flex items-center justify-center">
+                        <img src={img.base64} alt={`새 첨부 ${idx}`} className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => removeNewImage(idx)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -237,11 +355,11 @@ export default function SiteManagementSection() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button type="button" variant="outline" onClick={handleReset} className="gap-2">
+              <Button type="button" variant="outline" onClick={handleReset} className="gap-2" disabled={isUploading}>
                 <RotateCcw className="h-4 w-4" /> 초기화
               </Button>
-              <Button type="submit" className="gap-2 px-8">
-                {editingId ? <><Save className="h-4 w-4" /> 저장</> : <><PlusCircle className="h-4 w-4" /> 등록</>}
+              <Button type="submit" className="gap-2 px-8" disabled={isUploading}>
+                {isUploading ? <><Loader2 className="h-4 w-4 animate-spin" /> 업로드 중...</> : editingId ? <><Save className="h-4 w-4" /> 저장</> : <><PlusCircle className="h-4 w-4" /> 등록</>}
               </Button>
             </div>
           </form>
