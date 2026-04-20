@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, ExternalLink, ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { CategoryBadge } from '@/components/common/CategoryBadge';
 import { TYPE_BADGE_COLORS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { CardFooter } from '@/components/ui/card';
@@ -137,38 +138,17 @@ export default function ResponsePlanTable({ data, isLoading, isFilterActive, act
                 displayData.map((row, idx) => (
                   <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors">
                     <TableCell className="border-r text-center align-top p-4">
-                      <Badge
-                        variant="outline"
-                        className="bg-emerald-50 text-emerald-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                      >
-                        {row.region}
-                      </Badge>
+                      <CategoryBadge category="region">{row.region}</CategoryBadge>
                     </TableCell>
                     <TableCell className="border-r text-center align-top p-4">
-                      <Badge
-                        variant="outline"
-                        className="bg-orange-50 text-orange-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                      >
-                        {row.phase}
-                      </Badge>
+                      <CategoryBadge category="phase">{row.phase}</CategoryBadge>
                     </TableCell>
                     <TableCell className="border-r text-center align-top p-4">
                       <div className="flex flex-wrap justify-center gap-1.5">
                         {Array.isArray(row.type) ? row.type.map((t: string) => (
-                          <Badge
-                            key={t}
-                            variant="outline"
-                            className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                          >
-                            {t}
-                          </Badge>
+                          <CategoryBadge key={t} category="type">{t}</CategoryBadge>
                         )) : (
-                          <Badge
-                            variant="outline"
-                            className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                          >
-                            {row.type}
-                          </Badge>
+                          <CategoryBadge category="type">{row.type}</CategoryBadge>
                         )}
                       </div>
                     </TableCell>

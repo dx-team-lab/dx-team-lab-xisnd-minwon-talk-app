@@ -60,5 +60,10 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin() || isManager();
     }
+
+    match /sites/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isManager();
+    }
   }
 }

@@ -65,7 +65,7 @@ export default function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Link href="/dashboard" className="flex items-center gap-2 mr-10">
+          <Link href="/dashboard/status" className="flex items-center gap-2 mr-10">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold">M</div>
             <span className="text-xl font-headline font-bold text-primary">민원 대응 지식 플랫폼</span>
           </Link>

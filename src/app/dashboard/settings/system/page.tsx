@@ -12,6 +12,7 @@ import ResponseGuideSection from '@/components/settings/ResponseGuideSection';
 import CaseExampleSection from '@/components/settings/CaseExampleSection';
 import ActionPlanLinkSection from '@/components/settings/ActionPlanLinkSection';
 import ResponseProcedureSection from '@/components/settings/ResponseProcedureSection';
+import SiteManagementSection from '@/components/settings/SiteManagementSection';
 
 export default function SystemSettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -41,7 +42,7 @@ export default function SystemSettingsPage() {
       const isAdmin = admins.some(a => a.id === user?.uid);
       const isManager = managers.some(m => m.id === user?.uid);
       if (!isAdmin && !isManager) {
-        router.push('/dashboard');
+        router.push('/dashboard/status');
       }
     }
   }, [user, isUserLoading, admins, managers, isAdminLoading, isManagerLoading, router]);
@@ -68,8 +69,14 @@ export default function SystemSettingsPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="response" className="w-full">
-          <TabsList className="bg-white border w-full md:w-auto grid grid-cols-2 lg:grid-cols-4 rounded-xl p-1 h-auto">
+        <Tabs defaultValue="site" className="w-full">
+          <TabsList className="bg-white border w-full md:w-auto grid grid-cols-2 lg:flex rounded-xl p-1 h-auto">
+            <TabsTrigger value="site" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
+              현장 관리
+            </TabsTrigger>
+            <TabsTrigger value="procedure" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
+              민원 대응 절차 관리
+            </TabsTrigger>
             <TabsTrigger value="response" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               대응 방안
             </TabsTrigger>
@@ -79,12 +86,15 @@ export default function SystemSettingsPage() {
             <TabsTrigger value="actionLinks" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               조치방안(링크)
             </TabsTrigger>
-            <TabsTrigger value="procedure" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
-              민원 대응 절차 관리
-            </TabsTrigger>
           </TabsList>
           
           <div className="mt-8">
+            <TabsContent value="site">
+              <SiteManagementSection />
+            </TabsContent>
+            <TabsContent value="procedure">
+              <ResponseProcedureSection />
+            </TabsContent>
             <TabsContent value="response">
               <ResponseGuideSection />
             </TabsContent>
@@ -93,9 +103,6 @@ export default function SystemSettingsPage() {
             </TabsContent>
             <TabsContent value="actionLinks">
               <ActionPlanLinkSection />
-            </TabsContent>
-            <TabsContent value="procedure">
-              <ResponseProcedureSection />
             </TabsContent>
           </div>
         </Tabs>

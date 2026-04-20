@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { CategoryBadge } from '@/components/common/CategoryBadge';
 import { Loader2, ExternalLink, ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CASE_BADGE_COLORS, METHOD_BADGE_COLORS, TYPE_BADGE_COLORS } from '@/lib/constants';
@@ -108,38 +109,17 @@ export default function CaseTable({ data, isLoading }: CaseTableProps) {
                   slicedData.map((item, idx) => (
                     <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors">
                       <TableCell className="border-r text-center align-top p-4">
-                        <Badge
-                          variant="outline"
-                          className="bg-emerald-50 text-emerald-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                        >
-                          {item.region}
-                        </Badge>
+                        <CategoryBadge category="region">{item.region}</CategoryBadge>
                       </TableCell>
                       <TableCell className="border-r text-center align-top p-4">
-                        <Badge
-                          variant="outline"
-                          className="bg-orange-50 text-orange-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                        >
-                          {item.phase}
-                        </Badge>
+                        <CategoryBadge category="phase">{item.phase}</CategoryBadge>
                       </TableCell>
                       <TableCell className="border-r text-center align-top p-4">
                         <div className="flex flex-wrap justify-center gap-1.5">
                           {Array.isArray(item.type) ? item.type.map((t: string) => (
-                            <Badge
-                              key={t}
-                              variant="outline"
-                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                            >
-                              {t}
-                            </Badge>
+                            <CategoryBadge key={t} category="type">{t}</CategoryBadge>
                           )) : (
-                            <Badge
-                              variant="outline"
-                              className="bg-blue-50 text-blue-700 border-none rounded-full text-sm font-bold whitespace-nowrap px-3 py-1"
-                            >
-                              {item.type}
-                            </Badge>
+                            <CategoryBadge category="type">{item.type}</CategoryBadge>
                           )}
                         </div>
                       </TableCell>
