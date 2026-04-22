@@ -77,6 +77,7 @@ const ComplaintDetailsModal = ({
         style={{ width: '100%', maxWidth: '900px', maxHeight: '90vh' }}
         onClick={e => e.stopPropagation()}
       >
+        {/* ── 헤더 : 항상 고정 ── */}
         <div className="flex items-center justify-between p-4 border-b shrink-0">
           <div>
              <h2 className="text-xl font-bold text-slate-800">{siteName}</h2>
@@ -99,43 +100,45 @@ const ComplaintDetailsModal = ({
             </button>
           </div>
         </div>
-        
-        <div className="p-6 overflow-auto flex flex-col gap-6">
-          <div className="w-full flex justify-center">
-            <div className="flex items-start justify-between w-full max-w-[700px] mx-auto px-4 pt-2">
-              {STAGES.slice(0, 4).map((stage, idx) => {
-                const status = getStageStatus(idx);
-                const isLast = idx === 3;
-                return (
-                  <React.Fragment key={stage}>
-                    <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                      {status === 'completed' ? (
-                        <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10 border-2 border-blue-600">
-                          <Check className="w-5 h-5" />
-                        </div>
-                      ) : status === 'current' ? (
-                        <div className="w-9 h-9 rounded-full bg-white text-blue-600 border-2 border-blue-600 flex items-center justify-center z-10 shadow-[0_0_0_3px_rgba(37,99,235,0.2)]">
-                          <Hourglass className="w-4 h-4 animate-pulse" />
-                        </div>
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-white text-slate-300 border-2 border-slate-300 flex items-center justify-center z-10">
-                          <Circle className="w-3 h-3 fill-slate-200" />
-                        </div>
-                      )}
-                      <span className={`text-xs font-bold text-center whitespace-nowrap ${status === 'pending' ? 'text-slate-400' : 'text-slate-700'}`}>
-                        {stage}
-                      </span>
-                    </div>
-                    {!isLast && (
-                      <div className={`flex-1 h-[2px] mt-[18px] mx-2 ${idx < currentStageIndex && currentStageIndex > 0 ? 'bg-blue-600' : 'bg-slate-200'}`} />
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
 
-          <div className="mt-8 border border-slate-200 rounded-lg overflow-hidden">
+        {/* ── 스텝퍼 : 헤더 바로 아래 고정 ── */}
+        <div className="shrink-0 px-6 pt-6 pb-4 border-b border-slate-100 bg-white">
+          <div className="flex items-start justify-between w-full max-w-[700px] mx-auto px-4">
+            {STAGES.slice(0, 4).map((stage, idx) => {
+              const status = getStageStatus(idx);
+              const isLast = idx === 3;
+              return (
+                <React.Fragment key={stage}>
+                  <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                    {status === 'completed' ? (
+                      <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10 border-2 border-blue-600">
+                        <Check className="w-5 h-5" />
+                      </div>
+                    ) : status === 'current' ? (
+                      <div className="w-9 h-9 rounded-full bg-white text-blue-600 border-2 border-blue-600 flex items-center justify-center z-10 shadow-[0_0_0_3px_rgba(37,99,235,0.2)]">
+                        <Hourglass className="w-4 h-4 animate-pulse" />
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-white text-slate-300 border-2 border-slate-300 flex items-center justify-center z-10">
+                        <Circle className="w-3 h-3 fill-slate-200" />
+                      </div>
+                    )}
+                    <span className={`text-xs font-bold text-center whitespace-nowrap ${status === 'pending' ? 'text-slate-400' : 'text-slate-700'}`}>
+                      {stage}
+                    </span>
+                  </div>
+                  {!isLast && (
+                    <div className={`flex-1 h-[2px] mt-[18px] mx-2 ${idx < currentStageIndex && currentStageIndex > 0 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── 테이블 : 이 영역만 스크롤 ── */}
+        <div className="modal-scroll-area flex-1 overflow-y-auto p-6">
+          <div className="border border-slate-200 rounded-lg overflow-hidden">
              <Table className="border-collapse w-full">
                <TableBody>
                  {STAGES.slice(0, 4).map((stage) => {
