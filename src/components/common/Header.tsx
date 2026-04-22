@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, Loader2, Users, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { LogOut, Settings, Loader2, Users, SlidersHorizontal, ChevronDown, History } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import { collection, doc } from 'firebase/firestore';
@@ -116,6 +116,13 @@ export default function Header() {
                     시스템 설정
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/logs" className="flex w-full items-center gap-2 cursor-pointer p-2">
+                    <History className="h-4 w-4" />
+                    시스템 로그
+                  </Link>
+                </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           )}

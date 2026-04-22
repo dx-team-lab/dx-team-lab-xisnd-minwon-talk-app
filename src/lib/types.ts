@@ -51,3 +51,15 @@ export interface UserProfile {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+export interface ActivityLog {
+  id?: string;
+  actorEmail: string;
+  actorName: string;
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  targetSiteName: string;
+  targetId: string;
+  details: string;
+  createdAt: Timestamp;
+}
+

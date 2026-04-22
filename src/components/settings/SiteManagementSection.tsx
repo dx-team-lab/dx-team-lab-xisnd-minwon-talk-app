@@ -15,8 +15,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Trash2, Edit2, PlusCircle, RotateCcw, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { Site, SiteImage, SiteComplaint } from '@/lib/types';
+import { Site, SiteImage, SiteComplaint, UserProfile } from '@/lib/types';
 import { compressImageToBase64 } from '@/lib/imageUtils';
+import { logActivity } from '@/lib/activity-logs';
+import { useDoc } from '@/firebase';
+
 
 const REGION_OPTIONS = [
   '서울', '경기도', '인천', '대전', '대구', '부산', '울산', '광주', '세종', 
@@ -30,6 +33,15 @@ export default function SiteManagementSection() {
   const db = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
+
+  const userProfileRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, 'users', user.uid);
+  }, [db, user]);
+  const { data: userProfile } = useDoc(userProfileRef);
+  const actorName = (userProfile as UserProfile)?.name || user?.displayName || user?.email || 'Unknown';
+  const actorEmail = user?.email || 'Unknown';
+
 
   const [formData, setFormData] = useState<Partial<Site>>({
     region: '',
@@ -170,6 +182,15 @@ export default function SiteManagementSection() {
       if (editingId) {
         updateDocumentNonBlocking(doc(db, 'sites', editingId), payload);
         toast({ title: "성공", description: "현장 정보가 수정되었습니다." });
+        
+        await logActivity(db, {
+          actorEmail,
+          actorName,
+          action: 'UPDATE',
+          targetSiteName: payload.siteName || 'Unknown',
+          targetId: editingId,
+          details: `현장 정보 수정: ${payload.siteName}`
+        });
       } else {
         const docRef = await addDoc(collection(db, 'sites'), {
           ...payload,
@@ -178,7 +199,17 @@ export default function SiteManagementSection() {
         });
         targetSiteId = docRef.id;
         toast({ title: "성공", description: "현장 정보가 등록되었습니다." });
+
+        await logActivity(db, {
+          actorEmail,
+          actorName,
+          action: 'CREATE',
+          targetSiteName: payload.siteName || 'Unknown',
+          targetId: targetSiteId,
+          details: `새 현장 등록: ${payload.siteName}`
+        });
       }
+
       
       // Handle new subcollection images
       if (targetSiteId && images.length > 0) {
@@ -199,9 +230,20 @@ export default function SiteManagementSection() {
         const currentIds = complaints.map(c => c.id).filter(id => id); // Get defined IDs
         const deletedIds = existingIds.filter(id => !currentIds.includes(id as string));
         
-        for (const  deletedId of deletedIds) {
+        for (const deletedId of deletedIds) {
+          const deletedComp = existingComplaints.find(ec => ec.id === deletedId);
           await deleteDoc(doc(db, `sites/${targetSiteId}/complaints`, deletedId as string));
+          
+          await logActivity(db, {
+            actorEmail,
+            actorName,
+            action: 'DELETE',
+            targetSiteName: siteName as string,
+            targetId: deletedId as string,
+            details: `민원인 삭제: ${deletedComp?.complainant || deletedId}`
+          });
         }
+
 
         // Add or Update
         for (let i = 0; i < complaints.length; i++) {
@@ -218,10 +260,35 @@ export default function SiteManagementSection() {
           };
           if (c.id) {
             await updateDoc(doc(db, `sites/${targetSiteId}/complaints`, c.id), cPayload);
+            
+            // Check if status changed or just general update
+            const oldComp = existingComplaints.find(oc => oc.id === c.id);
+            const statusChanged = oldComp && oldComp.status !== c.status;
+            
+            await logActivity(db, {
+              actorEmail,
+              actorName,
+              action: 'UPDATE',
+              targetSiteName: siteName as string,
+              targetId: c.id,
+              details: statusChanged 
+                ? `민원 상태 변경: ${c.complainant} (${oldComp.status} -> ${c.status})`
+                : `민원 정보 수정: ${c.complainant}`
+            });
           } else {
-            await addDoc(collection(db, `sites/${targetSiteId}/complaints`), { ...cPayload, createdAt: serverTimestamp() });
+            const newDoc = await addDoc(collection(db, `sites/${targetSiteId}/complaints`), { ...cPayload, createdAt: serverTimestamp() });
+            
+            await logActivity(db, {
+              actorEmail,
+              actorName,
+              action: 'CREATE',
+              targetSiteName: siteName as string,
+              targetId: newDoc.id,
+              details: `새 민원 등록: ${c.complainant}`
+            });
           }
         }
+
       }
       
       setIsUploading(false);
@@ -286,9 +353,23 @@ export default function SiteManagementSection() {
         console.warn('Failed to cascade delete subcollections', e);
       }
       
+      const targetSite = sites?.find(s => s.id === deleteConfirmId);
+      const targetSiteName = targetSite?.siteName || 'Unknown';
+
       deleteDocumentNonBlocking(doc(db, 'sites', deleteConfirmId));
       toast({ title: "삭제 완료", description: "현장 정보가 삭제되었습니다." });
+
+      await logActivity(db, {
+        actorEmail,
+        actorName,
+        action: 'DELETE',
+        targetSiteName,
+        targetId: deleteConfirmId,
+        details: `현장 삭제: ${targetSiteName}`
+      });
+
       setDeleteConfirmId(null);
+
     }
   };
 
