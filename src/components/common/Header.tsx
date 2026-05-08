@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, Loader2, Users, SlidersHorizontal, ChevronDown, History } from 'lucide-react';
@@ -53,7 +54,7 @@ export default function Header() {
   const navItems = [
     { name: '민원 현황', href: '/dashboard/status' },
     { name: '민원 대응 절차', href: '/dashboard/process' },
-    { name: '대응 방안/유사 사례', href: '/dashboard' },
+    { name: '대응 방안/유사 사례', href: '/dashboard/guides' },
   ];
 
   const isSettingsActive = pathname.startsWith('/dashboard/users') || pathname.startsWith('/dashboard/settings') || pathname.startsWith('/admin/logs');
@@ -63,9 +64,17 @@ export default function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Link href="/dashboard/status" className="flex items-center gap-2 mr-10">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold">M</div>
-            <span className="text-xl font-headline font-bold text-primary">민원 대응 지식 플랫폼</span>
+          <Link href="/dashboard" className="flex items-center gap-3 mr-10 hover:opacity-80 transition-opacity">
+            <Image 
+              src="/logo.png" 
+              alt="MinwonTalk Logo" 
+              width={32} 
+              height={32} 
+              className="h-8 w-auto object-contain"
+            />
+            <span className="text-xl font-extrabold tracking-tight text-slate-800">
+              민원 대응 지식 플랫폼
+            </span>
           </Link>
         </div>
 
@@ -74,11 +83,11 @@ export default function Header() {
           {navItems.map((item) => {
             let isActive = false;
             
-            // '대응 방안/유사 사례' 메뉴(/dashboard)는 하위 경로와 겹치지 않도록 정확한 일치만 확인
+            // '홈' 메뉴(/dashboard)는 하위 경로와 겹치지 않도록 정확한 일치만 확인
             if (item.href === '/dashboard') {
               isActive = pathname === '/dashboard' || pathname === '/dashboard/';
             } else {
-              // 나머지 하위 메뉴들은 자신의 경로(예: /dashboard/status)로 시작하는지 포함하여 확인
+              // 나머지 하위 메뉴들은 자신의 경로로 시작하는지 포함하여 확인
               isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             }
 

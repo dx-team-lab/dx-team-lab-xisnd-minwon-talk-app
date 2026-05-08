@@ -34,7 +34,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user && !isUserLoading) {
-      router.push('/dashboard/status');
+      router.push('/dashboard');
     }
   }, [user, isUserLoading, router]);
 

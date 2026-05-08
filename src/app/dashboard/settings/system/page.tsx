@@ -13,6 +13,7 @@ import CaseExampleSection from '@/components/settings/CaseExampleSection';
 import ActionPlanLinkSection from '@/components/settings/ActionPlanLinkSection';
 import ResponseProcedureSection from '@/components/settings/ResponseProcedureSection';
 import SiteManagementSection from '@/components/settings/SiteManagementSection';
+import MainImageSettingsSection from '@/components/settings/MainImageSettingsSection';
 
 export default function SystemSettingsPage() {
   const { user, isUserLoading } = useUser();
@@ -74,6 +75,9 @@ export default function SystemSettingsPage() {
             <TabsTrigger value="site" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               현장 관리
             </TabsTrigger>
+            <TabsTrigger value="mainImage" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
+              메인 이미지
+            </TabsTrigger>
             <TabsTrigger value="procedure" className="rounded-lg py-3 px-8 font-bold data-[state=active]:bg-primary data-[state=active]:text-white">
               민원 대응 절차 관리
             </TabsTrigger>
@@ -91,6 +95,9 @@ export default function SystemSettingsPage() {
           <div className="mt-8">
             <TabsContent value="site">
               <SiteManagementSection />
+            </TabsContent>
+            <TabsContent value="mainImage">
+              <MainImageSettingsSection />
             </TabsContent>
             <TabsContent value="procedure">
               <ResponseProcedureSection />
